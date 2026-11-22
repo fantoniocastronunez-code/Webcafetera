@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Oster 7200 PRO Control</title>
@@ -102,7 +101,7 @@
           <span style="color:#888; line-height: 36px;">Cronómetro</span>
           <div style="display: flex; flex-direction: column; padding-top: 6px; border-top: 1px dashed #333;">
             <span style="color:#888;">Peso en taza <span id="valBat" style="color:#2ecc71; font-size:10px; margin-left:4px; display:none;">(🔋 --%)</span></span>
-            <button onclick="fetch('/tare').then(() => { let t = document.getElementById('toast'); t.innerText = 'Balanza Tarada (0.0g)'; t.style.backgroundColor = '#10b981'; t.className = 'show'; setTimeout(() => { t.className = t.className.replace('show', ''); }, 2000); });" style="background: #333; border: 1px solid #555; color: #fff; padding: 2px 8px; border-radius: 4px; margin-top: 4px; font-size: 11px; cursor: pointer; width: fit-content;">TARE 0.0g</button>
+            <button onclick="fetch('http://192.168.1.68/tare').then(() => { let t = document.getElementById('toast'); t.innerText = 'Balanza Tarada (0.0g)'; t.style.backgroundColor = '#10b981'; t.className = 'show'; setTimeout(() => { t.className = t.className.replace('show', ''); }, 2000); });" style="background: #333; border: 1px solid #555; color: #fff; padding: 2px 8px; border-radius: 4px; margin-top: 4px; font-size: 11px; cursor: pointer; width: fit-content;">TARE 0.0g</button>
           </div>
         </div>
 
@@ -392,11 +391,11 @@
       if (nuevaMeta > 105) nuevaMeta = 105;
       state.target = nuevaMeta;
       document.getElementById('valMeta').innerText = nuevaMeta;
-      fetch('/setTemp?val=' + nuevaMeta);
+      fetch('http://192.168.1.68/setTemp?val=' + nuevaMeta);
     }
-    function togglePower() { fetch('/setPower?state=' + (state.pwr ? '0' : '1')); }
-    function toggleSteam() { fetch('/setSteam?state=' + (state.stm ? '0' : '1')); }
-    function togglePump() { fetch('/setPump?state=' + (state.pmp ? '0' : '1')); }
+    function togglePower() { fetch('http://192.168.1.68/setPower?state=' + (state.pwr ? '0' : '1')); }
+    function toggleSteam() { fetch('http://192.168.1.68/setSteam?state=' + (state.stm ? '0' : '1')); }
+    function togglePump() { fetch('http://192.168.1.68/setPump?state=' + (state.pmp ? '0' : '1')); }
     let lockInputsUntil = 0;
     const valNum = (id) => String(document.getElementById(id).value).replace(',', '.').trim();
     const buildQuery = (pairs) => {
@@ -408,7 +407,7 @@
       return parts.join('&');
     };
 
-    function setModoExtrac(m) { fetch('/setSettings?extMode=' + m); }
+    function setModoExtrac(m) { fetch('http://192.168.1.68/setSettings?extMode=' + m); }
 
     // --- GESTIÓN DE PERFILES BBW (Memoria Local del Navegador) ---
     let perfilActivo = 1;
@@ -452,7 +451,7 @@
         ['pre', 'wPre'], ['pausa', 'wPausa'],
         ['expTime', 'wExp'], ['tWeight', 'wWeight'], ['grind', 'wGrind']
       ]);
-      fetch('/setSettings?' + q).then(() => {
+      fetch('http://192.168.1.68/setSettings?' + q).then(() => {
         if (!silencioso) {
             let toast = document.getElementById('toast');
             toast.innerText = "Perfil " + (perfilActivo === 1 ? "IKAPE" : "ALIKISS") + " Aplicado!";
@@ -479,7 +478,7 @@
         ['pwrr', 'pwrr'], ['pwrb', 'pwrb'], ['pwrf', 'pwrf'], ['blow', 'blow'],
         ['offset', 'offset']
       ]);
-      fetch('/setSettings?' + q).then(() => {
+      fetch('http://192.168.1.68/setSettings?' + q).then(() => {
         let toast = document.getElementById('toast');
         toast.innerText = "Ajustes Guardados!";
         toast.style.backgroundColor = "#10b981";
@@ -489,7 +488,7 @@
     }
 
     function fetchAndRenderHistory() {
-      fetch('/getHistory').then(r => r.json()).then(logs => {
+      fetch('http://192.168.1.68/getHistory').then(r => r.json()).then(logs => {
         globalHistory = logs;
         const container = document.getElementById('historyList');
         if(logs.length === 0) {
@@ -510,7 +509,7 @@
 
     let currentChartId = 0; // Memoria para saber qué CSV descargar
     function descargarCSV() {
-      window.location.href = '/csv?id=' + currentChartId;
+      window.location.href = 'http://192.168.1.68/csv?id=' + currentChartId;
     }
 
     function verGraficoHistorial(index) {
@@ -652,7 +651,7 @@
     fetchAndRenderHistory(); // <-- Pide los datos a la ESP32 al abrir la web
 
     function pedirDatos() {
-        fetch('/status').then(r => r.json()).then(d => {
+        fetch('http://192.168.1.68/status').then(r => r.json()).then(d => {
             document.getElementById('valTemp').innerHTML = d.actual.toFixed(1) + '<span class="unit">°C</span>';
             let currentPres = d.presion || 0;
             
@@ -871,7 +870,7 @@
     let oledPollTimer = null;
 
     function despertarOled() {
-      fetch('/wakeOled').then(() => {
+      fetch('http://192.168.1.68/wakeOled').then(() => {
         let t = document.getElementById('toast');
         t.innerText = 'Pantalla OLED Despierta';
         t.style.backgroundColor = '#10b981';
@@ -912,7 +911,7 @@
 
     function actualizarEspejoOled() {
       if (!oledMirrorActive) return;
-      fetch('/oled').then(r => r.text()).then(hex => {
+      fetch('http://192.168.1.68/oled').then(r => r.text()).then(hex => {
         if (!oledMirrorActive) return;
         if (hex.length >= 2048) {
           const oCanvas = document.getElementById('oledMirrorCanvas');
