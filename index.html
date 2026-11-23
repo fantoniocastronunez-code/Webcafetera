@@ -369,16 +369,24 @@
           <div>
             <div style="color:#888; font-size:11px;">PESO GRANOS (IKAPE) <span id="ikapeStatusDot"
                 style="color:#555;">●</span></div>
-            <button onclick="tararBalanzaGranos()"
-              style="background: #2a2a2a; border: 1px solid #555; color: #fff; padding: 3px 10px; border-radius: 4px; margin-top: 4px; font-size: 11px; cursor: pointer;">TARE
-              0.0g</button>
+            <div style="display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap;">
+              <button onclick="tararBalanzaGranos()"
+                style="background: #2a2a2a; border: 1px solid #555; color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer;">TARE
+                0.0g</button>
+              <button id="btnRegistrarDosis" onclick="registrarDosisGranos()"
+                style="background: #2a2a2a; border: 1px solid #f59e0b; color: #f59e0b; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer;">✔
+                REGISTRAR DOSIS</button>
+            </div>
           </div>
         </div>
         <div style="text-align: right;">
           <div id="valGranos" style="font-size: 28px; font-weight: bold; color: #f59e0b;">0.0<span class="unit">g</span>
           </div>
           <div style="font-size: 11px; color: #888;">Dosis registrada: <span id="valDosisShot"
-              style="color: #e0e0e0; font-weight: bold;">-- g</span></div>
+              style="color: #e0e0e0; font-weight: bold;">-- g</span> <button id="btnLimpiarDosis"
+              onclick="limpiarDosisRegistrada()" title="Borrar dosis registrada"
+              style="display: none; background: transparent; border: none; color: #e74c3c; font-size: 11px; cursor: pointer; padding: 0 2px;">✖</button>
+          </div>
         </div>
       </div>
 
@@ -766,8 +774,24 @@
       });
     }
 
+    let lastTopHistorySig = null;
+    let pendingLinkDose = false;
+
     function fetchAndRenderHistory() {
       fetch('http://192.168.1.68/getHistory').then(r => r.json()).then(logs => {
+        if (logs.length > 0) {
+          const topSig = `${logs[0].isSteam}-${logs[0].duration}-${logs[0].count}-${logs[0].maxT}-${logs[0].maxP}`;
+          if (pendingLinkDose && topSig !== lastTopHistorySig && !logs[0].isSteam && ultimaDosisPesada > 0) {
+            for (let i = 4; i > 0; i--) {
+              if (dosisPorShot[i - 1] !== undefined) dosisPorShot[i] = dosisPorShot[i - 1];
+              else delete dosisPorShot[i];
+            }
+            dosisPorShot[0] = ultimaDosisPesada.toFixed(1);
+            localStorage.setItem('ikape_dosis_historial', JSON.stringify(dosisPorShot));
+          }
+          lastTopHistorySig = topSig;
+        }
+        pendingLinkDose = false;
         globalHistory = logs;
         const container = document.getElementById('historyList');
         if (logs.length === 0) {
@@ -1039,6 +1063,7 @@
           }
 
           // Al apagar la bomba, la web le pide a la ESP32 su memoria actualizada
+          if (ultimaDosisPesada > 0) pendingLinkDose = true;
           setTimeout(fetchAndRenderHistory, 1500);
         }
         wasPumpOn = state.pmp;
@@ -1166,19 +1191,100 @@
     // ==========================================
     let ultimaDosisPesada = parseFloat(localStorage.getItem('ikape_ultima_dosis')) || 0;
     let dosisPorShot = JSON.parse(localStorage.getItem('ikape_dosis_historial')) || {};
-    let wasPumpOnIkape = false;
+    let dosisRegistrada = (ultimaDosisPesada > 0 && localStorage.getItem('ikape_dosis_registrada') === '1');
+    let pesoGranosActual = 0;
+    let ikapeOnline = false;
 
-    if (ultimaDosisPesada > 0 && document.getElementById('valDosisShot')) {
-      document.getElementById('valDosisShot').innerText = ultimaDosisPesada.toFixed(1) + ' g';
+    function mostrarToastIkape(msg, color) {
+      let t = document.getElementById('toast');
+      if (!t) return;
+      t.innerText = msg;
+      t.style.backgroundColor = color;
+      t.className = 'show';
+      setTimeout(() => { t.className = t.className.replace('show', ''); }, 2200);
+    }
+
+    function actualizarVistaDosis() {
+      const dosisEl = document.getElementById('valDosisShot');
+      const clearBtn = document.getElementById('btnLimpiarDosis');
+      const regBtn = document.getElementById('btnRegistrarDosis');
+
+      if (dosisEl) {
+        if (ultimaDosisPesada > 0) {
+          dosisEl.innerText = ultimaDosisPesada.toFixed(1) + (dosisRegistrada ? ' g ✔' : ' g');
+          dosisEl.style.color = dosisRegistrada ? '#2ecc71' : '#e0e0e0';
+        } else {
+          dosisEl.innerText = ikapeOnline ? '-- g' : 'Sin red .190';
+          dosisEl.style.color = '#e0e0e0';
+        }
+      }
+      if (clearBtn) {
+        clearBtn.style.display = (ultimaDosisPesada > 0) ? 'inline-block' : 'none';
+      }
+      if (regBtn) {
+        if (pesoGranosActual > 0.1) {
+          if (dosisRegistrada && Math.abs(pesoGranosActual - ultimaDosisPesada) < 0.05) {
+            regBtn.innerText = '✔ DOSIS REGISTRADA';
+            regBtn.style.background = '#2ecc71';
+            regBtn.style.borderColor = '#2ecc71';
+            regBtn.style.color = '#000';
+          } else {
+            regBtn.innerText = '✔ REGISTRAR (' + pesoGranosActual.toFixed(1) + 'g)';
+            regBtn.style.background = '#f59e0b';
+            regBtn.style.borderColor = '#f59e0b';
+            regBtn.style.color = '#000';
+          }
+        } else if (dosisRegistrada && ultimaDosisPesada > 0) {
+          regBtn.innerText = '✔ REGISTRADA (' + ultimaDosisPesada.toFixed(1) + 'g)';
+          regBtn.style.background = 'rgba(46, 204, 113, 0.15)';
+          regBtn.style.borderColor = '#2ecc71';
+          regBtn.style.color = '#2ecc71';
+        } else {
+          regBtn.innerText = '✔ REGISTRAR DOSIS';
+          regBtn.style.background = '#2a2a2a';
+          regBtn.style.borderColor = '#f59e0b';
+          regBtn.style.color = '#f59e0b';
+        }
+      }
+    }
+
+    function registrarDosisGranos() {
+      if (!ikapeOnline) {
+        mostrarToastIkape('Balanza IKAPE (.190) sin conexión', '#e74c3c');
+        return;
+      }
+      if (pesoGranosActual <= 0.1) {
+        mostrarToastIkape('Coloca los granos en la balanza (> 0.1g)', '#e67e22');
+        return;
+      }
+      ultimaDosisPesada = pesoGranosActual;
+      dosisRegistrada = true;
+      localStorage.setItem('ikape_ultima_dosis', ultimaDosisPesada.toFixed(1));
+      localStorage.setItem('ikape_dosis_registrada', '1');
+      actualizarVistaDosis();
+      mostrarToastIkape('Dosis registrada: ' + ultimaDosisPesada.toFixed(1) + ' g ✔', '#10b981');
+    }
+
+    function limpiarDosisRegistrada() {
+      ultimaDosisPesada = 0;
+      dosisRegistrada = false;
+      localStorage.removeItem('ikape_ultima_dosis');
+      localStorage.removeItem('ikape_dosis_registrada');
+      let ratioEl = document.getElementById('valRatio');
+      if (ratioEl) ratioEl.innerText = '1:--';
+      actualizarVistaDosis();
+      mostrarToastIkape('Dosis registrada borrada', '#94a3b8');
+    }
+
+    if (ultimaDosisPesada > 0) {
+      actualizarVistaDosis();
     }
 
     function tararBalanzaGranos() {
       fetch('http://192.168.1.190/tare').then(() => {
-        let t = document.getElementById('toast');
-        t.innerText = 'Balanza Granos Tarada (0.0g)';
-        t.style.backgroundColor = '#f59e0b';
-        t.className = 'show';
-        setTimeout(() => { t.className = t.className.replace('show', ''); }, 2000);
+        pesoGranosActual = 0;
+        actualizarVistaDosis();
+        mostrarToastIkape('Balanza Granos Tarada (0.0g)', '#f59e0b');
       }).catch(() => { });
     }
 
@@ -1193,46 +1299,27 @@
           return r.json();
         })
         .then(b => {
+          ikapeOnline = true;
           const dot = document.getElementById('ikapeStatusDot');
           const valEl = document.getElementById('valGranos');
-          const dosisEl = document.getElementById('valDosisShot');
 
           if (dot) dot.style.color = (b.ble == 1) ? '#2ecc71' : '#e74c3c';
 
           const pesoVal = Number(b.pesoGranos);
           if (!Number.isNaN(pesoVal) && valEl) {
+            pesoGranosActual = pesoVal;
             valEl.innerHTML = pesoVal.toFixed(1) + '<span class="unit">g</span>';
-
-            // Si pesas más de 5g antes de moler, memoriza automáticamente la dosis del próximo shot
-            if (pesoVal >= 5.0) {
-              ultimaDosisPesada = pesoVal;
-              localStorage.setItem('ikape_ultima_dosis', ultimaDosisPesada.toFixed(1));
-              if (dosisEl) dosisEl.innerText = ultimaDosisPesada.toFixed(1) + ' g';
-            } else if (ultimaDosisPesada === 0 && dosisEl) {
-              dosisEl.innerText = '-- g';
-            }
           }
-
-          // Al finalizar una extracción en la cafetera, vincula la dosis pesada al último registro
-          if (!state.pmp && wasPumpOnIkape && ultimaDosisPesada > 0) {
-            setTimeout(() => {
-              if (globalHistory.length > 0) {
-                dosisPorShot[0] = ultimaDosisPesada.toFixed(1);
-                localStorage.setItem('ikape_dosis_historial', JSON.stringify(dosisPorShot));
-                fetchAndRenderHistory();
-              }
-            }, 1800);
-          }
-          wasPumpOnIkape = state.pmp;
+          actualizarVistaDosis();
 
           setTimeout(pedirDatosBalanzaGranos, 250);
         })
         .catch(() => {
           clearTimeout(timeoutId);
+          ikapeOnline = false;
           const dot = document.getElementById('ikapeStatusDot');
-          const dosisEl = document.getElementById('valDosisShot');
           if (dot) dot.style.color = '#555';
-          if (dosisEl && ultimaDosisPesada === 0) dosisEl.innerText = 'Sin red .190';
+          actualizarVistaDosis();
           setTimeout(pedirDatosBalanzaGranos, 1500);
         });
     }
