@@ -1281,11 +1281,22 @@
     }
 
     function tararBalanzaGranos() {
-      fetch('http://192.168.1.190/tare').then(() => {
-        pesoGranosActual = 0;
-        actualizarVistaDosis();
-        mostrarToastIkape('Balanza Granos Tarada (0.0g)', '#f59e0b');
-      }).catch(() => { });
+      fetch('http://192.168.1.190/tare')
+        .then(r => r.text())
+        .then(res => {
+          pesoGranosActual = 0;
+          const valEl = document.getElementById('valGranos');
+          if (valEl) valEl.innerHTML = '0.0<span class="unit">g</span>';
+          actualizarVistaDosis();
+          if (res.trim() === 'OK_BLE') {
+            mostrarToastIkape('Balanza IKAPE Tarada (0.0g)', '#10b981');
+          } else {
+            mostrarToastIkape('Tara local (0.0g) — revisa conexión BLE', '#f59e0b');
+          }
+        })
+        .catch(() => {
+          mostrarToastIkape('Sin conexión con .190 para tarar', '#e74c3c');
+        });
     }
 
     function pedirDatosBalanzaGranos() {
