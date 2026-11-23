@@ -352,8 +352,12 @@
           <div style="margin-top: 5px; padding-top: 5px; border-top: 1px dashed #333; width: 100%; text-align: right;">
             <div class="monitor-val" style="font-size: 32px; color: #10b981; margin-bottom: 2px;" id="valWeight">
               0.0<span class="unit">g</span></div>
-            <div id="valFlow" style="font-size: 14px; color: #38bdf8; font-weight: bold;">0.0 <span
-                style="font-size:11px; color:#888;">g/s</span></div>
+            <div style="display: flex; justify-content: flex-end; align-items: center; gap: 10px;">
+              <span id="valRatio" style="font-size: 14px; color: #f59e0b; font-weight: bold;">1:0.0</span>
+              <span style="color:#444;">|</span>
+              <span id="valFlow" style="font-size: 14px; color: #38bdf8; font-weight: bold;">0.0 <span
+                  style="font-size:11px; color:#888;">g/s</span></span>
+            </div>
           </div>
         </div>
       </div>
@@ -776,8 +780,13 @@
           card.style.cssText = "background: #222; border: 1px solid #444; border-radius: 6px; padding: 10px; min-width: 140px; font-size: 12px; cursor: pointer;";
           card.onclick = () => verGraficoHistorial(originalIndex);
           let tipo = log.isSteam ? "VAPOR" : "EXTRACCIÓN";
-          let dosisGuardada = dosisPorShot[originalIndex];
-          let lineaGranos = (!log.isSteam && dosisGuardada) ? `<br><span style="color:#f59e0b;">Granos: ${dosisGuardada}g</span>` : '';
+          let dosisGuardada = parseFloat(dosisPorShot[originalIndex]);
+          let maxW = (log.weight && log.weight.length > 0) ? Math.max(...log.weight) : 0;
+          let lineaGranos = '';
+          if (!log.isSteam && dosisGuardada > 0) {
+            let ratioFinal = maxW > 0 ? ` (1:${(maxW / dosisGuardada).toFixed(1)})` : '';
+            lineaGranos = `<br><span style="color:#f59e0b;">Dosis: ${dosisGuardada.toFixed(1)}g${ratioFinal}</span>`;
+          }
           card.innerHTML = `<b style="color:#e67e22">${tipo}</b>${lineaGranos}<br>Dur: ${log.duration}s<br>Max T: ${log.maxT}°C<br>Max P: ${log.maxP} bar`;
           container.appendChild(card);
         });
@@ -963,9 +972,18 @@
           document.getElementById('valTime').classList.remove('freno-activo');
         }
 
-        // Actualizar Peso y Caudal (g/s) en vivo
+        // Actualizar Peso, Ratio en vivo y Caudal (g/s)
         if (d.peso !== undefined) {
           document.getElementById('valWeight').innerHTML = d.peso.toFixed(1) + '<span class="unit">g</span>';
+          let ratioEl = document.getElementById('valRatio');
+          if (ratioEl) {
+            if (ultimaDosisPesada > 0) {
+              let ratioVal = Math.max(0, d.peso) / ultimaDosisPesada;
+              ratioEl.innerText = '1:' + ratioVal.toFixed(1);
+            } else {
+              ratioEl.innerText = '1:--';
+            }
+          }
         }
         if (d.flow !== undefined) {
           document.getElementById('valFlow').innerHTML = d.flow.toFixed(1) + ' <span style="font-size:11px; color:#888;">g/s</span>';
@@ -1201,7 +1219,9 @@
         })
         .catch(() => {
           const dot = document.getElementById('ikapeStatusDot');
+          const dosisEl = document.getElementById('valDosisShot');
           if (dot) dot.style.color = '#555';
+          if (dosisEl && ultimaDosisPesada === 0) dosisEl.innerText = 'Sin red .190';
           setTimeout(pedirDatosBalanzaGranos, 1500);
         });
     }
