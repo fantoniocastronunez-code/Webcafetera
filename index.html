@@ -1183,8 +1183,15 @@
     }
 
     function pedirDatosBalanzaGranos() {
-      fetch('http://192.168.1.190/status')
-        .then(r => r.json())
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1500);
+
+      fetch('http://192.168.1.190/status', { signal: controller.signal })
+        .then(r => {
+          clearTimeout(timeoutId);
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        })
         .then(b => {
           const dot = document.getElementById('ikapeStatusDot');
           const valEl = document.getElementById('valGranos');
@@ -1192,14 +1199,17 @@
 
           if (dot) dot.style.color = (b.ble == 1) ? '#2ecc71' : '#e74c3c';
 
-          if (b.pesoGranos !== undefined && valEl) {
-            valEl.innerHTML = b.pesoGranos.toFixed(1) + '<span class="unit">g</span>';
+          const pesoVal = Number(b.pesoGranos);
+          if (!Number.isNaN(pesoVal) && valEl) {
+            valEl.innerHTML = pesoVal.toFixed(1) + '<span class="unit">g</span>';
 
             // Si pesas más de 5g antes de moler, memoriza automáticamente la dosis del próximo shot
-            if (b.pesoGranos >= 5.0) {
-              ultimaDosisPesada = b.pesoGranos;
+            if (pesoVal >= 5.0) {
+              ultimaDosisPesada = pesoVal;
               localStorage.setItem('ikape_ultima_dosis', ultimaDosisPesada.toFixed(1));
               if (dosisEl) dosisEl.innerText = ultimaDosisPesada.toFixed(1) + ' g';
+            } else if (ultimaDosisPesada === 0 && dosisEl) {
+              dosisEl.innerText = '-- g';
             }
           }
 
@@ -1218,6 +1228,7 @@
           setTimeout(pedirDatosBalanzaGranos, 250);
         })
         .catch(() => {
+          clearTimeout(timeoutId);
           const dot = document.getElementById('ikapeStatusDot');
           const dosisEl = document.getElementById('valDosisShot');
           if (dot) dot.style.color = '#555';
