@@ -138,7 +138,92 @@
       padding: 20px;
       width: 100%;
       max-width: 400px;
+      max-block-size: 92dvh;
+      overflow-y: auto;
+      overscroll-behavior: contain;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    }
+
+    .pid-export-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .btn-pid-export {
+      flex: 1 1 130px;
+      min-block-size: var(--target-size);
+      min-inline-size: var(--target-size);
+      padding: 9px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      border: 1px solid #475569;
+      color: #fff;
+      background: #1e293b;
+    }
+
+    .btn-pid-share {
+      background: #0f766e;
+      border-color: #14b8a6;
+    }
+
+    .btn-pid-dl {
+      background: #1d4ed8;
+      border-color: #3b82f6;
+    }
+
+    .btn-pid-copy {
+      width: 100%;
+      background: #334155;
+      border-color: #64748b;
+    }
+
+    .btn-pid-copy[data-copied] {
+      border-color: #10b981;
+      color: #6ee7b7;
+    }
+
+    .btn-pid-copy[data-failed] {
+      border-color: #e74c3c;
+      color: #fca5a5;
+    }
+
+    .copy-pid-wrap {
+      position: relative;
+      display: inline-flex;
+      flex: 1 1 115px;
+    }
+
+    .copy-tip {
+      position: absolute;
+      inset-block-end: calc(100% + 6px);
+      inset-inline-start: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      color: #f8fafc;
+      border: 1px solid #475569;
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: bold;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.18s ease;
+    }
+
+    .btn-pid-copy[data-copied] + .copy-tip,
+    .btn-pid-copy[data-failed] + .copy-tip {
+      opacity: 1;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .copy-tip {
+        transition: none;
+      }
     }
 
     /* Botonera Central */
@@ -871,6 +956,8 @@
       <button class="btn" style="background: #222; color: #aaa; border-color: #444; margin-bottom: 10px;"
         onclick="document.getElementById('modalEng').style.display='flex'; switchTab('t-rep');">⚙️ INGENIERÍA
         PID</button>
+      <button type="button" class="btn" id="btnSharePidMain"
+        style="background: #222; color: #10b981; border-color: #10b981; margin-bottom: 10px;">📤 COMPARTIR PID (CSV)</button>
       <button class="btn" id="btnVerOled"
         style="background: #222; color: #38bdf8; border-color: #38bdf8; margin-bottom: 10px;"
         onclick="abrirOledModal()">🖥️ VER OLED</button>
@@ -974,6 +1061,16 @@
 
         <button class="btn-save"
           onclick="saveSettings(); document.getElementById('modalEng').style.display='none';">GUARDAR Y CERRAR</button>
+
+        <div class="pid-export-bar">
+          <button type="button" id="btnSharePidModal" class="btn-pid-export btn-pid-share">📤 COMPARTIR CSV (GEMINI)</button>
+          <button type="button" id="btnDownloadPidModal" class="btn-pid-export btn-pid-dl">📥 DESCARGAR CSV</button>
+          <span class="copy-pid-wrap">
+            <button type="button" id="btnCopyPidModal" class="btn-pid-export btn-pid-copy" command="--copy" commandfor="pidCsvSource">📋 COPIAR CSV</button>
+            <span id="pidCopyStatus" class="copy-tip" role="status"></span>
+          </span>
+        </div>
+        <textarea id="pidCsvSource" class="visually-hidden" readonly aria-label="Contenido CSV de ajustes PID"></textarea>
       </div>
     </div>
 
@@ -1301,6 +1398,12 @@
     let ultimaDosisPesada = parseFloat(localStorage.getItem('ikape_ultima_dosis')) || 0;
     let dosisPorShot = JSON.parse(localStorage.getItem('ikape_dosis_historial')) || {};
     let dosisRegistrada = (ultimaDosisPesada > 0 && localStorage.getItem('ikape_dosis_registrada') === '1');
+    let lastStatusData = null;
+    let cachedPidSettings = null;
+    try {
+      cachedPidSettings = JSON.parse(localStorage.getItem('esp32_last_pid_settings') || 'null');
+    } catch { cachedPidSettings = null; }
+    let lastPidCacheSig = '';
     let lastTopHistorySig = null;
     let initialHistoryLoaded = false;
     let pendingLinkDose = false;
@@ -1959,6 +2062,18 @@
       }
     }
 
+    function descargarArchivoCsv(csvText, filename) {
+      const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
     function descargarCSV() {
       pausarAutoCierreChart();
       const log = (currentChartId !== null && globalHistory[currentChartId]) ? globalHistory[currentChartId] : activeReportLog;
@@ -1986,18 +2101,156 @@
         const frenoVal = (brake && tNum >= (Number(brake.graphSec || 0) - 0.25)) ? '1' : '0';
         lines.push(`${t},${temp},${pres},${w},${flow},${ratio},${dStr},${frenoVal}`);
       }
-      const blob = new Blob([lines.join('\n') + '\n'], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
       const ratioTag = stats.finalRatio > 0 ? `_1x${stats.finalRatio.toFixed(2)}` : '';
       const doseTag = dosis > 0 ? `_${dosis.toFixed(1)}g` : '';
       const idTag = currentChartId !== null ? currentChartId : 'EnVivo';
-      link.href = url;
-      link.download = `Extraccion_${idTag}${doseTag}${ratioTag}.csv`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      descargarArchivoCsv(lines.join('\n') + '\n', `Extraccion_${idTag}${doseTag}${ratioTag}.csv`);
+    }
+
+    function csvCell(val) {
+      const s = String(val === undefined || val === null ? '' : val);
+      return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    }
+
+    function getPidSettingVal(key, inputId) {
+      if (inputId) {
+        const el = document.getElementById(inputId);
+        if (el) {
+          const raw = String(el.value).replace(',', '.').trim();
+          if (raw !== '') return raw;
+        }
+      }
+      if (lastStatusData && lastStatusData[key] !== undefined) return String(lastStatusData[key]);
+      if (cachedPidSettings && cachedPidSettings[key] !== undefined) return String(cachedPidSettings[key]);
+      return '';
+    }
+
+    function generarCsvAjustesPid() {
+      const kpr = getPidSettingVal('kpr', 'kpr');
+      const kpe = getPidSettingVal('kpe', 'kpe');
+      const kpt = getPidSettingVal('kpt', 'kpt');
+      const kpv = getPidSettingVal('kpv', 'kpv');
+      const hasData = Boolean(lastStatusData || cachedPidSettings || kpr !== '' || kpe !== '' || kpt !== '' || kpv !== '');
+
+      if (!hasData) {
+        return { csv: '', filename: '', hasData: false };
+      }
+
+      const now = new Date();
+      const pad2 = (n) => String(n).padStart(2, '0');
+      const stamp = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}_${pad2(now.getHours())}-${pad2(now.getMinutes())}`;
+      const extModeVal = getPidSettingVal('extMode');
+      const extModeDesc = extModeVal === '1' ? '1 (Brew By Weight)' : (extModeVal === '0' ? '0 (Flow Profiling)' : extModeVal);
+
+      const rows = [
+        ['Seccion', 'Parametro', 'Clave_ESP32', 'Valor', 'Unidad', 'Referencia_Hardware', 'Descripcion_Para_Analisis'],
+        ['Contexto', 'Fecha exportacion', 'timestamp', now.toISOString(), 'ISO-8601', '-', 'Momento de exportacion desde la web'],
+        ['Contexto', 'Maquina', 'hardware', 'Oster 7200 PRO / ESP32-S3 (Termopar MAX6675)', '-', '1000ms PWM / 4Hz PID', 'Termobloque con control SSR y sensor de presion'],
+        ['Contexto', 'Temperatura Meta', 'objetivo', getPidSettingVal('objetivo') || String(state.target), 'C', '80-105', 'Setpoint objetivo de extraccion'],
+        ['Contexto', 'Temperatura Actual Bloque', 'actual', getPidSettingVal('actual'), 'C', '-', 'Lectura termopar actual con offset aplicado'],
+        ['Contexto', 'Modo Extraccion', 'extMode', extModeDesc, '-', '0=Manual / 1=BBW', 'Modo activo al exportar'],
+        ['Contexto', 'Ventana PWM SSR', 'WindowSize', '1000', 'ms', '1000', 'Periodo fijo del actuador PWM del rele'],
+        ['Contexto', 'Frecuencia Calculo PID', 'pidRate', '4', 'Hz', '250 ms', 'Frecuencia sincronizada con lectura termopar'],
+        ['Contexto', 'Feed-Forward Inicio Bomba', 'feedForward', '1500', 'ms', '100% PWM', 'Rele clavado al 100% los primeros 1.5s de bomba para compensar agua fria'],
+        ['Contexto', 'Nota Estabilidad Termica Ultimo Shot', 'sTemp', getPidSettingVal('sTemp'), '%', '0-100 (+/-1.5 C)', 'Porcentaje de muestras dentro de +/-1.5 C respecto a la meta'],
+        ['Contexto', 'Nota Estabilidad Presion Ultimo Shot', 'sPres', getPidSettingVal('sPres'), '%', '0-100 (8-10 bar)', 'Porcentaje de muestras entre 8 y 10 bar tras superar 4 bar'],
+        ['Contexto', 'Duracion Ultimo Shot', 'tiempo', getPidSettingVal('tiempo'), 's', '-', 'Tiempo de contacto del ultimo shot'],
+        ['Contexto', 'Presion Pico Ultimo Shot', 'peakP', getPidSettingVal('peakP'), 'bar', '-', 'Presion maxima registrada en el ultimo shot'],
+
+        ['PID_Reposo', 'PID Kp Reposo (Fuerza)', 'kpr', kpr, '-', '>= 0', 'Ganancia proporcional en reposo'],
+        ['PID_Reposo', 'PID Ki Reposo (Inercia)', 'kir', getPidSettingVal('kir', 'kir'), '-', '>= 0', 'Ganancia integral en reposo'],
+        ['PID_Reposo', 'PID Kd Reposo (Freno)', 'kdr', getPidSettingVal('kdr', 'kdr'), '-', '>= 0', 'Ganancia derivativa en reposo'],
+        ['PID_Reposo', 'Potencia Max Reposo', 'pwrr', getPidSettingVal('pwrr', 'pwrr'), '%', '10-100 (en firmware: 0-150ms cerca meta / 0-350ms lejos)', 'Limite de potencia configurado para reposo'],
+        ['PID_Reposo', 'Offset Termico', 'offset', getPidSettingVal('offset', 'offset'), 'C', '-20 a +20', 'Compensacion aplicada a la lectura MAX6675'],
+
+        ['PID_Extraccion', 'PID Kp Extraccion (Fuerza)', 'kpe', kpe, '-', '>= 0', 'Ganancia proporcional activa cuando presion >= pmax'],
+        ['PID_Extraccion', 'PID Ki Extraccion (Inercia)', 'kie', getPidSettingVal('kie', 'kie'), '-', '>= 0', 'Ganancia integral activa en extraccion principal'],
+        ['PID_Extraccion', 'PID Kd Extraccion (Freno)', 'kde', getPidSettingVal('kde', 'kde'), '-', '>= 0', 'Ganancia derivativa activa en extraccion principal'],
+        ['PID_Extraccion', 'Soplado Final', 'blow', getPidSettingVal('blow', 'blow'), 's', '0-10', 'Tiempo de soplado configurado tras extraer'],
+        ['PID_Extraccion', 'Potencia Freno Manual', 'pwrf', getPidSettingVal('pwrf', 'pwrf'), '%', '0-100', 'Tope PWM aplicado cuando el usuario activa el freno manual'],
+
+        ['PID_Transicion', 'PID Kp Transicion (Fuerza)', 'kpt', kpt, '-', '>= 0', 'Ganancia proporcional entre pmin y pmax bar'],
+        ['PID_Transicion', 'PID Ki Transicion (Inercia)', 'kit', getPidSettingVal('kit', 'kit'), '-', '>= 0', 'Ganancia integral entre pmin y pmax bar'],
+        ['PID_Transicion', 'PID Kd Transicion (Freno)', 'kdt', getPidSettingVal('kdt', 'kdt'), '-', '>= 0', 'Ganancia derivativa entre pmin y pmax bar'],
+        ['PID_Transicion', 'Presion Inicio Transicion', 'pmin', getPidSettingVal('pmin', 'pmin'), 'bar', '0-12', 'Umbral inferior donde termina potencia de baja presion'],
+        ['PID_Transicion', 'Presion Fin Transicion', 'pmax', getPidSettingVal('pmax', 'pmax'), 'bar', '0-15', 'Umbral donde entra el PID principal de extraccion'],
+        ['PID_Transicion', 'Potencia Baja Presion', 'pwrb', getPidSettingVal('pwrb', 'pwrb'), '%', '0-100', 'Tope PWM mientras presion < pmin (pre-infusion / llenado)'],
+
+        ['PID_Vapor', 'PID Kp Vapor (Fuerza)', 'kpv', kpv, '-', '>= 0', 'Ganancia proporcional en modo vapor'],
+        ['PID_Vapor', 'PID Ki Vapor (Inercia)', 'kiv', getPidSettingVal('kiv', 'kiv'), '-', '>= 0', 'Ganancia integral en modo vapor'],
+        ['PID_Vapor', 'PID Kd Vapor (Freno)', 'kdv', getPidSettingVal('kdv', 'kdv'), '-', '>= 0', 'Ganancia derivativa en modo vapor'],
+        ['PID_Vapor', 'Inyeccion Agua Vapor', 'von', getPidSettingVal('von', 'von'), 'ms', '>= 0', 'Duracion pulso de bomba en modo vapor'],
+        ['PID_Vapor', 'Pausa Calor Vapor', 'voff', getPidSettingVal('voff', 'voff'), 'ms', '>= 0', 'Pausa entre pulsos de bomba en modo vapor'],
+
+        ['Extraccion_BBW', 'Pre-infusion', 'pre', getPidSettingVal('pre', 'wPre'), 's', '>= 0', 'Tiempo inicial de pre-infusion en BBW'],
+        ['Extraccion_BBW', 'Pausa Bloom', 'pausa', getPidSettingVal('pausa', 'wPausa'), 's', '>= 0', 'Pausa con bomba apagada tras pre-infusion en BBW'],
+        ['Extraccion_BBW', 'Tiempo Meta Extraccion', 'expTime', getPidSettingVal('expTime', 'wExp'), 's', '> 0', 'Objetivo de duracion de extraccion'],
+        ['Extraccion_BBW', 'Peso Limite BBW', 'tWeight', getPidSettingVal('tWeight', 'wWeight'), 'g', '> 0', 'Peso objetivo de corte en taza'],
+        ['Extraccion_BBW', 'Offset Goteo BBW', 'bbwOff', getPidSettingVal('bbwOff'), 'g', '>= 0', 'Compensacion base por goteo residual al cortar bomba'],
+        ['Extraccion_BBW', 'Molienda DF54 Actual', 'grind', getPidSettingVal('grind', 'wGrind'), 'puntos', '0.0-9.0', 'Ajuste actual del molino DF54']
+      ];
+
+      if (Array.isArray(globalHistory) && globalHistory.length > 0) {
+        globalHistory.slice(0, 5).forEach((log, idx) => {
+          if (log.isSteam) return;
+          const rawDose = (typeof dosisPorShot !== 'undefined') ? parseFloat(dosisPorShot[idx]) : NaN;
+          const dosis = rawDose > 0 ? rawDose : 0;
+          const stats = calcularAnalisisShot(log, dosis);
+          const meta = metaPorShot[idx] || null;
+          const diag = construirDiagnosticoShot(log, stats, meta, dosis);
+          const brake = obtenerDatosFreno(log, meta);
+          const brakeStr = brake ? `Freno ${Number(brake.contactSec || brake.graphSec || 0).toFixed(1)}s (${Number(brake.temp || 0).toFixed(1)}C)` : 'Sin freno';
+          const scoreStr = meta ? `NotaT ${meta.sTemp || 0}% / NotaP ${meta.sPres || 0}%` : '';
+          rows.push([
+            'Historial_Reciente',
+            `Extraccion #${idx + 1}`,
+            `shot_${idx + 1}`,
+            `${Number(log.duration || 0).toFixed(1)}s | T:${stats.minTVal.toFixed(1)}-${stats.maxTVal.toFixed(1)}C (Prom ${stats.avgTVal.toFixed(1)}C) | P.Max:${Number(log.maxP || 0).toFixed(1)}b`,
+            'resumen',
+            scoreStr || '-',
+            `${diag.shortBadge} | ${brakeStr}`
+          ]);
+        });
+      }
+
+      const csv = rows.map((r) => r.map(csvCell).join(',')).join('\n') + '\n';
+      return { csv, filename: `Oster7200_PID_Ajustes_${stamp}.csv`, hasData: true };
+    }
+
+    function syncPidCsvSource() {
+      const { csv, hasData } = generarCsvAjustesPid();
+      const src = document.getElementById('pidCsvSource');
+      if (src) src.value = hasData ? csv : '';
+      return hasData;
+    }
+
+    async function compartirCsvPid(modo = 'share') {
+      const { csv, filename, hasData } = generarCsvAjustesPid();
+      if (!hasData) {
+        mostrarToast('Sin datos PID aún: conéctate a la ESP32 primero', '#e67e22', 3500);
+        return;
+      }
+
+      const file = (typeof File !== 'undefined')
+        ? new File([csv], filename, { type: 'text/csv;charset=utf-8;' })
+        : null;
+
+      if (modo === 'share' && file && navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+        try {
+          await navigator.share({
+            title: 'Ajustes PID - Oster 7200 PRO',
+            text: 'CSV con todos los ajustes PID (Reposo, Extracción, Transición, Vapor) y métricas térmicas para analizar con Gemini.',
+            files: [file]
+          });
+          mostrarToast('CSV de ajustes PID compartido ✔', '#10b981', 3000);
+          return;
+        } catch (err) {
+          if (err && err.name === 'AbortError') return;
+        }
+      }
+
+      descargarArchivoCsv(csv, filename);
+      mostrarToast('CSV de ajustes PID descargado ✔ (listo para Gemini)', '#10b981', 3500);
     }
 
     function aplicarBannerDiagnostico(diag, liveHint) {
@@ -2690,6 +2943,95 @@
       });
     })();
 
+    (function initPidExportControls() {
+      const btnShareMain = document.getElementById('btnSharePidMain');
+      if (btnShareMain) btnShareMain.addEventListener('click', () => compartirCsvPid('share'));
+
+      const btnShareModal = document.getElementById('btnSharePidModal');
+      if (btnShareModal) btnShareModal.addEventListener('click', () => compartirCsvPid('share'));
+
+      const btnDlModal = document.getElementById('btnDownloadPidModal');
+      if (btnDlModal) btnDlModal.addEventListener('click', () => compartirCsvPid('download'));
+
+      const copyTimers = new WeakMap();
+      let lastCopyMessage = '';
+
+      function legacyCopyText(text) {
+        const previousFocus = document.activeElement;
+        const field = Object.assign(document.createElement('textarea'), { value: text });
+        field.setAttribute('readonly', '');
+        field.style.cssText = 'position:fixed;inset-block-start:0;opacity:0';
+        document.body.append(field);
+        field.select();
+        try {
+          return document.execCommand('copy');
+        } finally {
+          field.remove();
+          previousFocus?.focus({ preventScroll: true });
+        }
+      }
+
+      function reportCopyStatus(button, ok, customMsg) {
+        const tip = button.nextElementSibling;
+        clearTimeout(copyTimers.get(button));
+        button.removeAttribute('data-copied');
+        button.removeAttribute('data-failed');
+        let message = customMsg || (ok ? 'CSV copiado' : 'Error al copiar');
+        if (message === lastCopyMessage) message += '\u00A0';
+        lastCopyMessage = message;
+        if (tip) tip.textContent = '';
+        void button.offsetWidth;
+        button.setAttribute(ok ? 'data-copied' : 'data-failed', '');
+        requestAnimationFrame(() => { if (tip) tip.textContent = message; });
+        copyTimers.set(button, setTimeout(() => {
+          button.removeAttribute('data-copied');
+          button.removeAttribute('data-failed');
+          if (tip) tip.textContent = '';
+        }, 2200));
+      }
+
+      async function copyPidCsv(button, target) {
+        if (target && target.id === 'pidCsvSource') {
+          if (!syncPidCsvSource()) {
+            reportCopyStatus(button, false, 'Sin datos PID');
+            return;
+          }
+        }
+        const text = target
+          ? (target.matches('input, textarea') ? target.value : target.innerText.trim())
+          : '';
+        if (!text) {
+          reportCopyStatus(button, false, 'Sin datos PID');
+          return;
+        }
+        try {
+          await navigator.clipboard.writeText(text);
+          reportCopyStatus(button, true);
+        } catch {
+          try {
+            if (!legacyCopyText(text)) throw new Error('Copy failed');
+            reportCopyStatus(button, true);
+          } catch {
+            reportCopyStatus(button, false);
+          }
+        }
+      }
+
+      if ('CommandEvent' in window) {
+        document.addEventListener('command', (event) => {
+          if (event.command === '--copy') copyPidCsv(event.source, event.target);
+        }, true);
+      } else {
+        document.addEventListener('click', (event) => {
+          if (event.defaultPrevented) return;
+          const button = event.target.closest('button[command="--copy"]');
+          if (!button) return;
+          const target = document.getElementById(button.getAttribute('commandfor'));
+          if (target) copyPidCsv(button, target);
+        });
+      }
+    })();
+
     fetchAndRenderHistory(); // <-- Pide los datos a la ESP32 al abrir la web
 
     function pedirDatos() {
@@ -2699,6 +3041,22 @@
         clearTimeout(timeoutId);
         return r.json();
       }).then(d => {
+        lastStatusData = d;
+        const pidSnapshot = {
+          objetivo: d.objetivo, offset: d.offset, extMode: d.extMode,
+          sTemp: d.sTemp, sPres: d.sPres, tiempo: d.tiempo, peakP: d.peakP,
+          kpr: d.kpr, kir: d.kir, kdr: d.kdr, pwrr: d.pwrr,
+          kpe: d.kpe, kie: d.kie, kde: d.kde, blow: d.blow, pwrf: d.pwrf,
+          kpt: d.kpt, kit: d.kit, kdt: d.kdt, pmin: d.pmin, pmax: d.pmax, pwrb: d.pwrb,
+          kpv: d.kpv, kiv: d.kiv, kdv: d.kdv, von: d.von, voff: d.voff,
+          pre: d.pre, pausa: d.pausa, expTime: d.expTime, tWeight: d.tWeight, bbwOff: d.bbwOff, grind: d.grind
+        };
+        const pidSig = JSON.stringify(pidSnapshot);
+        if (pidSig !== lastPidCacheSig) {
+          lastPidCacheSig = pidSig;
+          cachedPidSettings = pidSnapshot;
+          localStorage.setItem('esp32_last_pid_settings', pidSig);
+        }
         document.getElementById('valTemp').innerHTML = d.actual.toFixed(1) + '<span class="unit">°C</span>';
         let currentPres = d.presion || 0;
 
