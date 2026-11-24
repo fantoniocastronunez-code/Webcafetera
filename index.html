@@ -256,6 +256,133 @@
       background: #27ae60;
     }
 
+    /* --- INFORME ANALÍTICO DE EXTRACCIÓN --- */
+    .report-modal-shell {
+      inline-size: 100%;
+      block-size: 100vh;
+      block-size: 100dvh;
+      max-inline-size: none;
+      border-radius: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      background: #121212;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      gap: 10px;
+    }
+
+    .report-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
+      gap: 8px;
+      background: #181818;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      font-family: monospace;
+    }
+
+    .report-stat-card {
+      background: #111;
+      border: 1px solid #2b2b2b;
+      border-radius: 6px;
+      padding: 7px 9px;
+      min-inline-size: 0;
+    }
+
+    .report-stat-label {
+      font-size: 10px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .report-stat-val {
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .report-stat-sub {
+      font-size: 10px;
+      color: #94a3b8;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .report-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .report-layer-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .layer-pill {
+      background: #1a1a1a;
+      border: 1px solid #444;
+      color: #888;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .layer-pill.active {
+      background: #242424;
+      color: #fff;
+    }
+
+    .report-milestones {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font-size: 11px;
+    }
+
+    .milestone-chip {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #fbbf24;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    .report-canvas-wrap {
+      flex: 1 1 280px;
+      min-block-size: 260px;
+      position: relative;
+    }
+
+    #historyCanvas {
+      display: block;
+      inline-size: 100%;
+      block-size: 100%;
+      margin-top: 0;
+      background: #0a0a0a;
+      border: 1px solid #333;
+      border-radius: 6px;
+      touch-action: none;
+    }
+
     /* --- NOTIFICACIÓN NATIVA (TOAST) --- */
     #toast {
       visibility: hidden;
@@ -427,7 +554,7 @@
           onclick="setModoExtrac(1)">BREW BY WEIGHT</button>
       </div>
       <button class="btn" style="background: #222; color: #aaa; border-color: #444; margin-bottom: 10px;"
-        onclick="document.getElementById('modalBbw').style.display='flex'; if(typeof cargarPerfil === 'function') cargarPerfil(perfilActivo);">⚖️
+        onclick="document.getElementById('modalBbw').style.display='flex'; if(typeof cargarPerfil === 'function') cargarPerfil(perfilActivo, false);">⚖️
         PERFILES BREW BY WEIGHT</button>
 
       <button class="btn" style="background: #222; color: #aaa; border-color: #444; margin-bottom: 10px;"
@@ -467,7 +594,7 @@
         <div class="setting-group"><label>Peso Límite (g)</label><input type="number" id="wWeight" step="0.1"></div>
         <hr style="border: 0; border-top: 1px solid #333; margin: 10px 0;">
         <div class="setting-group"><label>Puntos Molienda</label><input type="number" id="wGrind" step="0.1" min="0"
-            max="90"></div>
+            max="9.0"></div>
         <button class="btn-save" onclick="saveBbw(); document.getElementById('modalBbw').style.display='none';">GUARDAR
           Y APLICAR PERFIL</button>
       </div>
@@ -550,31 +677,79 @@
   </div>
 
   <!-- MODAL GRÁFICO PANTALLA COMPLETA -->
-  <div id="chartModal" class="modal">
-    <div class="modal-content"
-      style="width: 100vw; height: 100vh; max-width: none; border-radius: 0; display: flex; flex-direction: column; padding: 20px; background: #121212;">
-      <div class="panel-title" style="display:flex; justify-content:space-between; margin-bottom: 10px;">
-        <span id="chartTitle" style="color: var(--accent); font-size: 18px;">EXTRACCIÓN</span>
-        <span style="cursor:pointer; color:var(--danger); font-size:18px;"
-          onclick="document.getElementById('chartModal').style.display='none';">✖</span>
+  <div id="chartModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="chartTitle">
+    <div class="modal-content report-modal-shell">
+      <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0; gap: 10px; flex-wrap: wrap;">
+        <div>
+          <span id="chartTitle" style="color: var(--accent); font-size: 18px;">EXTRACCIÓN</span>
+          <div id="chartMetaRow" style="font-size: 11px; color: #94a3b8; text-transform: none; margin-top: 2px;"></div>
+        </div>
+        <span style="cursor:pointer; color:var(--danger); font-size:18px; padding: 2px 6px;"
+          onclick="cerrarChartModal()">✖</span>
       </div>
-      <div id="chartStats"
-        style="display: flex; justify-content: space-between; background: #1e1e1e; padding: 15px; border-radius: 8px; margin-bottom: 15px; font-family: monospace; font-size: 14px; border: 1px solid #333;">
-        <div style="color: #888;">⏱️ <span id="statDur" style="color: #fff; font-weight: bold;">--</span></div>
-        <div style="color: #888;">MAX T: <span id="statMaxT" style="color: #e67e22; font-weight: bold;">--</span></div>
-        <div style="color: #888;">MAX P: <span id="statMaxP" style="color: #3498db; font-weight: bold;">--</span></div>
-        <div style="color: #888;">MAX W: <span id="statMaxW" style="color: #10b981; font-weight: bold;">--</span></div>
+
+      <div id="chartStats" class="report-stats-grid">
+        <div class="report-stat-card" style="border-color: rgba(245, 158, 11, 0.45);">
+          <div class="report-stat-label">RATIO EXTRACCIÓN</div>
+          <div class="report-stat-val" id="statRatio" style="color: #f59e0b;">--</div>
+          <div class="report-stat-sub" id="statRatioSub">Sin dosis</div>
+        </div>
+        <div class="report-stat-card">
+          <div class="report-stat-label">DOSIS CAFÉ <button id="btnEditDose" type="button" onclick="toggleEditarDosisInforme()" title="Editar dosis del shot" style="background:transparent; border:none; color:#f59e0b; cursor:pointer; font-size:11px; padding:0 3px;">✏️</button></div>
+          <div class="report-stat-val" id="statDoseVal" style="color: #fbbf24;">-- g</div>
+          <div id="statDoseEditWrap" style="display:none; gap:4px; align-items:center; margin-top:3px;">
+            <input type="number" id="statDoseInput" step="0.1" min="1" max="50" style="width:62px; background:#0a0a0a; border:1px solid #f59e0b; color:#fff; border-radius:4px; padding:2px 4px; font-size:12px;">
+            <button type="button" onclick="guardarDosisInforme()" style="background:#10b981; color:#000; border:none; border-radius:4px; padding:2px 6px; font-size:11px; font-weight:bold; cursor:pointer;">OK</button>
+          </div>
+          <div class="report-stat-sub" id="statDoseSub">IKAPE</div>
+        </div>
+        <div class="report-stat-card">
+          <div class="report-stat-label">PESO EN TAZA</div>
+          <div class="report-stat-val" id="statMaxW" style="color: #10b981;">--</div>
+          <div class="report-stat-sub" id="statEndW">Final: --</div>
+        </div>
+        <div class="report-stat-card">
+          <div class="report-stat-label">TIEMPO / 1ª GOTA</div>
+          <div class="report-stat-val" id="statDur" style="color: #fff;">--</div>
+          <div class="report-stat-sub" id="statDurSub">1ª gota: --</div>
+        </div>
+        <div class="report-stat-card">
+          <div class="report-stat-label">CAUDAL (FLOW)</div>
+          <div class="report-stat-val" id="statFlowAvg" style="color: #38bdf8;">--</div>
+          <div class="report-stat-sub" id="statFlowPeak">Pico: --</div>
+        </div>
+        <div class="report-stat-card">
+          <div class="report-stat-label">TEMPERATURA</div>
+          <div class="report-stat-val" id="statMaxT" style="color: #e67e22;">--</div>
+          <div class="report-stat-sub" id="statTempSub">Rango: --</div>
+        </div>
+        <div class="report-stat-card">
+          <div class="report-stat-label">PRESIÓN</div>
+          <div class="report-stat-val" id="statMaxP" style="color: #3498db;">--</div>
+          <div class="report-stat-sub" id="statPresSub">Prom: --</div>
+        </div>
       </div>
-      <div style="flex-grow: 1; min-height: 0; position: relative;">
-        <canvas id="historyCanvas"
-          style="width: 100%; height: 100%; background: #0a0a0a; border: 1px solid #333; border-radius: 4px;"></canvas>
+
+      <div class="report-toolbar">
+        <div id="chartLayerBar" class="report-layer-bar">
+          <button type="button" id="toggleTemp" class="layer-pill active" style="border-color:#e67e22; color:#e67e22;" onclick="toggleReportLayer('temp')">● Temp</button>
+          <button type="button" id="togglePres" class="layer-pill active" style="border-color:#3498db; color:#3498db;" onclick="toggleReportLayer('pres')">● Presión</button>
+          <button type="button" id="toggleWeight" class="layer-pill active" style="border-color:#10b981; color:#10b981;" onclick="toggleReportLayer('weight')">● Peso</button>
+          <button type="button" id="toggleFlow" class="layer-pill active" style="border-color:#38bdf8; color:#38bdf8;" onclick="toggleReportLayer('flow')">● Caudal</button>
+          <button type="button" id="toggleRatio" class="layer-pill active" style="border-color:#f59e0b; color:#f59e0b;" onclick="toggleReportLayer('ratio')">● Ratio</button>
+        </div>
+        <div id="chartMilestones" class="report-milestones"></div>
       </div>
-      <div style="display: flex; gap: 10px; margin-top: 15px;">
+
+      <div class="report-canvas-wrap">
+        <canvas id="historyCanvas"></canvas>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 2px;">
         <button class="btn-save" style="background: #3498db; color: #fff; margin-top: 0; flex: 1;"
-          onclick="descargarCSV()">📥 DESCARGAR CSV</button>
+          onclick="descargarCSV()">📥 DESCARGAR CSV COMPLETO</button>
         <button class="btn-save" style="background: #dc2626; color: #fff; margin-top: 0; flex: 1;"
-          onclick="document.getElementById('chartModal').style.display='none'; document.getElementById('historyCanvas').onmousemove = null; document.getElementById('historyCanvas').ontouchmove = null;">✖
-          CERRAR</button>
+          onclick="cerrarChartModal()">✖ CERRAR</button>
       </div>
     </div>
   </div>
@@ -699,11 +874,29 @@
     // --- GESTIÓN DE PERFILES BBW (Memoria Local del Navegador) ---
     let perfilActivo = 1;
     let perfilesBbw = JSON.parse(localStorage.getItem('bbw_profiles')) || {
-      1: { bean: "", pre: 3, pausa: 3, expTime: 30, tWeight: 38.0, grind: 15.0 }, // Canasta Ikape 19g
+      1: { bean: "", pre: 3, pausa: 3, expTime: 30, tWeight: 38.0, grind: 1.5 }, // Canasta Ikape 19g
       2: { bean: "", pre: 3, pausa: 3, expTime: 30, tWeight: 36.0, grind: 2.5 }   // Canasta Alikiss
     };
 
-    function cargarPerfil(num) {
+    // Corregir valores antiguos fuera de escala DF54 (0.0 a 9.0), ej. typo 15.0 -> 1.5
+    let bbwDirty = false;
+    [1, 2].forEach((k) => {
+      if (!perfilesBbw[k]) return;
+      let g = parseFloat(perfilesBbw[k].grind);
+      if (Number.isNaN(g) || g === 15) {
+        perfilesBbw[k].grind = (k === 1) ? 1.5 : 2.5;
+        bbwDirty = true;
+      } else if (g > 9.0) {
+        perfilesBbw[k].grind = 9.0;
+        bbwDirty = true;
+      } else if (g < 0) {
+        perfilesBbw[k].grind = 0.0;
+        bbwDirty = true;
+      }
+    });
+    if (bbwDirty) localStorage.setItem('bbw_profiles', JSON.stringify(perfilesBbw));
+
+    function cargarPerfil(num, aplicarEnEsp32 = true) {
       perfilActivo = num;
       document.getElementById('tabProf1').classList.toggle('active', num === 1);
       document.getElementById('tabProf2').classList.toggle('active', num === 2);
@@ -716,8 +909,8 @@
       document.getElementById('wWeight').value = p.tWeight;
       document.getElementById('wGrind').value = p.grind;
 
-      // Enviar silenciosamente a la ESP32 al cambiar de pestaña para que ya esté lista
-      saveBbw(true);
+      // Solo enviar a la ESP32 al cambiar de pestaña dentro del modal, no al abrirlo
+      if (aplicarEnEsp32) saveBbw(true);
     }
 
     function saveBbw(silencioso = false) {
@@ -776,192 +969,634 @@
 
     let lastTopHistorySig = null;
     let pendingLinkDose = false;
+    let pendingShotMeta = null;
+    let metaPorShot = JSON.parse(localStorage.getItem('shot_meta_historial')) || {};
+
+    function calcularAnalisisShot(log, dosis) {
+      const n = (log && log.temp) ? log.temp.length : 0;
+      const weights = (log && log.weight && log.weight.length === n) ? log.weight : Array(n).fill(0);
+      const temps = (log && log.temp) ? log.temp : [];
+      const press = (log && log.pres && log.pres.length === n) ? log.pres : Array(n).fill(0);
+
+      // Caudal instantáneo suavizado (g/s) desde las muestras de 0.5s
+      const flowArr = [];
+      let prevSmoothFlow = 0;
+      for (let i = 0; i < n; i++) {
+        if (i === 0) {
+          flowArr.push(0);
+          continue;
+        }
+        const backIdx = Math.max(0, i - 2);
+        const dt = (i - backIdx) * 0.5;
+        let rawF = dt > 0 ? (weights[i] - weights[backIdx]) / dt : 0;
+        if (rawF < 0 || rawF > 15) rawF = 0;
+        const sm = i === 1 ? rawF : (prevSmoothFlow * 0.5 + rawF * 0.5);
+        prevSmoothFlow = sm;
+        flowArr.push(sm);
+      }
+
+      // Ratio punto a punto (1 : peso / dosis)
+      const ratioArr = (dosis > 0) ? weights.map((w) => Math.max(0, w) / dosis) : Array(n).fill(0);
+
+      // Métricas térmicas
+      const validTemps = temps.filter((t) => t > 0);
+      const minTVal = validTemps.length ? Math.min(...validTemps) : 0;
+      const maxTVal = validTemps.length ? Math.max(...validTemps) : 0;
+      const avgTVal = validTemps.length ? (validTemps.reduce((a, b) => a + b, 0) / validTemps.length) : 0;
+      const deltaTVal = validTemps.length ? (maxTVal - minTVal) : 0;
+
+      // Métricas de presión
+      const activePress = press.filter((p) => p > 1.5);
+      const mainPress = press.filter((p) => p >= 4.0);
+      const avgPVal = activePress.length ? (activePress.reduce((a, b) => a + b, 0) / activePress.length) : 0;
+      const avgPMain = mainPress.length ? (mainPress.reduce((a, b) => a + b, 0) / mainPress.length) : 0;
+      const mainPresSec = mainPress.length * 0.5;
+      let peakPVal = 0, peakPIdx = -1;
+      for (let i = 0; i < n; i++) {
+        if (press[i] > peakPVal) {
+          peakPVal = press[i];
+          peakPIdx = i;
+        }
+      }
+
+      // Métricas de peso, 1ª gota, caudal y ratio
+      const maxW = weights.length ? Math.max(...weights) : 0;
+      const endW = weights.length ? weights[weights.length - 1] : 0;
+      const firstDropIdx = weights.findIndex((w) => w >= 0.3);
+      const firstDropSec = firstDropIdx >= 0 ? firstDropIdx * 0.5 : null;
+      const flowTimeSec = (firstDropIdx >= 0 && n > firstDropIdx) ? Math.max(0.5, (n - 1 - firstDropIdx) * 0.5) : 0;
+      const avgFlow = (firstDropIdx >= 0 && flowTimeSec > 0) ? Math.max(0, (maxW - Math.max(0, weights[firstDropIdx])) / flowTimeSec) : 0;
+      const peakFlow = flowArr.length ? Math.max(...flowArr) : 0;
+      const finalRatio = (dosis > 0 && maxW > 0) ? (maxW / dosis) : 0;
+      const ebfPct = (dosis > 0 && maxW > 0) ? ((dosis / maxW) * 100) : 0;
+
+      // Hitos de ratio (1:1, 1:1.5, 1:2, 1:2.5, 1:3)
+      const ratioMilestones = [];
+      if (dosis > 0 && maxW > 0) {
+        [1.0, 1.5, 2.0, 2.5, 3.0].forEach((targetR) => {
+          const idx = ratioArr.findIndex((r) => r >= targetR);
+          if (idx >= 0) {
+            ratioMilestones.push({ targetR, idx, sec: idx * 0.5 });
+          }
+        });
+      }
+
+      return {
+        n, weights, temps, press, flowArr, ratioArr,
+        minTVal, maxTVal, avgTVal, deltaTVal,
+        avgPVal, avgPMain, mainPresSec, peakPVal, peakPIdx,
+        maxW, endW, firstDropIdx, firstDropSec, flowTimeSec,
+        avgFlow, peakFlow, finalRatio, ebfPct, ratioMilestones
+      };
+    }
+
+    function renderHistoryCards() {
+      const container = document.getElementById('historyList');
+      if (!globalHistory || globalHistory.length === 0) {
+        container.innerHTML = '<div style="color: #888; font-size: 12px;">Sin datos aún...</div>';
+        return;
+      }
+      container.innerHTML = '';
+      globalHistory.forEach((log, originalIndex) => {
+        let card = document.createElement('div');
+        card.style.cssText = "background: #222; border: 1px solid #444; border-radius: 6px; padding: 10px; min-width: 150px; font-size: 12px; cursor: pointer;";
+        card.onclick = () => verGraficoHistorial(originalIndex);
+        let tipo = log.isSteam ? "VAPOR" : "EXTRACCIÓN";
+        let dosisGuardada = parseFloat(dosisPorShot[originalIndex]);
+        let maxW = (log.weight && log.weight.length > 0) ? Math.max(...log.weight) : 0;
+        let lineaGranos = '';
+        if (!log.isSteam && dosisGuardada > 0) {
+          let ratioFinal = maxW > 0 ? ` · <b style="color:#f59e0b;">1:${(maxW / dosisGuardada).toFixed(2)}</b>` : '';
+          lineaGranos = `<br><span style="color:#fbbf24;">Dosis: ${dosisGuardada.toFixed(1)}g${ratioFinal}</span>`;
+        }
+        let yieldTxt = (!log.isSteam && maxW > 0) ? ` · ${maxW.toFixed(1)}g` : '';
+        card.innerHTML = `<b style="color:#e67e22">${tipo}</b>${lineaGranos}<br>Dur: ${log.duration}s${yieldTxt}<br>Max T: ${log.maxT}°C<br>Max P: ${log.maxP} bar`;
+        container.appendChild(card);
+      });
+    }
 
     function fetchAndRenderHistory() {
       fetch('http://192.168.1.68/getHistory').then(r => r.json()).then(logs => {
         if (logs.length > 0) {
           const topSig = `${logs[0].isSteam}-${logs[0].duration}-${logs[0].count}-${logs[0].maxT}-${logs[0].maxP}`;
-          if (pendingLinkDose && topSig !== lastTopHistorySig && !logs[0].isSteam && ultimaDosisPesada > 0) {
+          if (lastTopHistorySig !== null && topSig !== lastTopHistorySig) {
             for (let i = 4; i > 0; i--) {
               if (dosisPorShot[i - 1] !== undefined) dosisPorShot[i] = dosisPorShot[i - 1];
               else delete dosisPorShot[i];
+              if (metaPorShot[i - 1] !== undefined) metaPorShot[i] = metaPorShot[i - 1];
+              else delete metaPorShot[i];
             }
+            if (pendingLinkDose && !logs[0].isSteam && ultimaDosisPesada > 0) {
+              dosisPorShot[0] = ultimaDosisPesada.toFixed(1);
+            } else {
+              delete dosisPorShot[0];
+            }
+            if (!logs[0].isSteam && pendingShotMeta) {
+              metaPorShot[0] = pendingShotMeta;
+            } else {
+              delete metaPorShot[0];
+            }
+            localStorage.setItem('ikape_dosis_historial', JSON.stringify(dosisPorShot));
+            localStorage.setItem('shot_meta_historial', JSON.stringify(metaPorShot));
+          } else if (lastTopHistorySig === null && pendingLinkDose && !logs[0].isSteam && ultimaDosisPesada > 0) {
             dosisPorShot[0] = ultimaDosisPesada.toFixed(1);
             localStorage.setItem('ikape_dosis_historial', JSON.stringify(dosisPorShot));
           }
           lastTopHistorySig = topSig;
         }
         pendingLinkDose = false;
+        pendingShotMeta = null;
         globalHistory = logs;
-        const container = document.getElementById('historyList');
-        if (logs.length === 0) {
-          container.innerHTML = '<div style="color: #888; font-size: 12px;">Sin datos aún...</div>';
-          return;
-        }
-        container.innerHTML = '';
-        logs.forEach((log, originalIndex) => {
-          let card = document.createElement('div');
-          card.style.cssText = "background: #222; border: 1px solid #444; border-radius: 6px; padding: 10px; min-width: 140px; font-size: 12px; cursor: pointer;";
-          card.onclick = () => verGraficoHistorial(originalIndex);
-          let tipo = log.isSteam ? "VAPOR" : "EXTRACCIÓN";
-          let dosisGuardada = parseFloat(dosisPorShot[originalIndex]);
-          let maxW = (log.weight && log.weight.length > 0) ? Math.max(...log.weight) : 0;
-          let lineaGranos = '';
-          if (!log.isSteam && dosisGuardada > 0) {
-            let ratioFinal = maxW > 0 ? ` (1:${(maxW / dosisGuardada).toFixed(1)})` : '';
-            lineaGranos = `<br><span style="color:#f59e0b;">Dosis: ${dosisGuardada.toFixed(1)}g${ratioFinal}</span>`;
-          }
-          card.innerHTML = `<b style="color:#e67e22">${tipo}</b>${lineaGranos}<br>Dur: ${log.duration}s<br>Max T: ${log.maxT}°C<br>Max P: ${log.maxP} bar`;
-          container.appendChild(card);
-        });
+        renderHistoryCards();
       }).catch(e => console.log("Error cargando historial", e));
     }
 
     let currentChartId = 0; // Memoria para saber qué CSV descargar
+    let reportLayers = { temp: true, pres: true, weight: true, flow: true, ratio: true };
+    let lastCursorIndex = -1;
+    let chartResizeHandler = null;
+
+    function toggleReportLayer(layer) {
+      reportLayers[layer] = !reportLayers[layer];
+      const map = { temp: 'toggleTemp', pres: 'togglePres', weight: 'toggleWeight', flow: 'toggleFlow', ratio: 'toggleRatio' };
+      const btn = document.getElementById(map[layer]);
+      if (btn) {
+        btn.classList.toggle('active', reportLayers[layer]);
+        btn.style.opacity = reportLayers[layer] ? '1' : '0.42';
+      }
+      if (typeof window.updateGraphCursor === 'function') {
+        window.updateGraphCursor(lastCursorIndex);
+      }
+    }
+
+    function toggleEditarDosisInforme() {
+      const wrap = document.getElementById('statDoseEditWrap');
+      const valEl = document.getElementById('statDoseVal');
+      const inp = document.getElementById('statDoseInput');
+      if (!wrap || !valEl || !inp) return;
+      const opening = (wrap.style.display === 'none' || wrap.style.display === '');
+      if (opening) {
+        const cur = parseFloat(dosisPorShot[currentChartId]);
+        inp.value = cur > 0 ? cur.toFixed(1) : (ultimaDosisPesada > 0 ? ultimaDosisPesada.toFixed(1) : '18.0');
+        wrap.style.display = 'flex';
+        valEl.style.display = 'none';
+        inp.focus();
+        inp.select();
+      } else {
+        wrap.style.display = 'none';
+        valEl.style.display = 'block';
+      }
+    }
+
+    function guardarDosisInforme() {
+      const inp = document.getElementById('statDoseInput');
+      const val = parseFloat(String(inp.value).replace(',', '.'));
+      if (Number.isNaN(val) || val <= 0 || val > 50) {
+        delete dosisPorShot[currentChartId];
+      } else {
+        dosisPorShot[currentChartId] = val.toFixed(1);
+      }
+      localStorage.setItem('ikape_dosis_historial', JSON.stringify(dosisPorShot));
+      document.getElementById('statDoseEditWrap').style.display = 'none';
+      document.getElementById('statDoseVal').style.display = 'block';
+      renderHistoryCards();
+      verGraficoHistorial(currentChartId);
+    }
+
+    function cerrarChartModal() {
+      const modal = document.getElementById('chartModal');
+      const hCanvas = document.getElementById('historyCanvas');
+      if (modal) modal.style.display = 'none';
+      if (hCanvas) {
+        hCanvas.onmousemove = null;
+        hCanvas.ontouchmove = null;
+        hCanvas.onmouseleave = null;
+        hCanvas.ontouchend = null;
+      }
+      if (chartResizeHandler) {
+        window.removeEventListener('resize', chartResizeHandler);
+        chartResizeHandler = null;
+      }
+      lastCursorIndex = -1;
+    }
+
     function descargarCSV() {
-      window.location.href = 'http://192.168.1.68/csv?id=' + currentChartId;
+      const log = globalHistory[currentChartId];
+      if (!log || !log.temp || log.temp.length === 0) {
+        window.location.href = 'http://192.168.1.68/csv?id=' + currentChartId;
+        return;
+      }
+      const dosis = parseFloat(dosisPorShot[currentChartId]) || 0;
+      const stats = calcularAnalisisShot(log, dosis);
+      const lines = ['Tiempo(s),Temperatura(C),Presion(Bar),Peso(g),Caudal(g/s),Ratio(1:X),Dosis(g)'];
+      for (let i = 0; i < stats.n; i++) {
+        const t = (i * 0.5).toFixed(1);
+        const temp = Number(stats.temps[i] || 0).toFixed(1);
+        const pres = Number(stats.press[i] || 0).toFixed(1);
+        const w = Number(stats.weights[i] || 0).toFixed(1);
+        const flow = Number(stats.flowArr[i] || 0).toFixed(2);
+        const ratio = dosis > 0 ? Number(stats.ratioArr[i] || 0).toFixed(2) : '';
+        const dStr = dosis > 0 ? dosis.toFixed(1) : '';
+        lines.push(`${t},${temp},${pres},${w},${flow},${ratio},${dStr}`);
+      }
+      const blob = new Blob([lines.join('\n') + '\n'], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const ratioTag = stats.finalRatio > 0 ? `_1x${stats.finalRatio.toFixed(2)}` : '';
+      const doseTag = dosis > 0 ? `_${dosis.toFixed(1)}g` : '';
+      link.href = url;
+      link.download = `Extraccion_${currentChartId}${doseTag}${ratioTag}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
 
     function verGraficoHistorial(index) {
       currentChartId = index;
       const log = globalHistory[index];
-      if (!log || !log.temp) { alert("Aún no hay datos de curva."); return; }
+      if (!log || !log.temp || log.temp.length === 0) { alert("Aún no hay datos de curva."); return; }
+
+      const rawDose = parseFloat(dosisPorShot[index]);
+      const dosis = (!log.isSteam && rawDose > 0) ? rawDose : 0;
+      const meta = (!log.isSteam && metaPorShot[index]) ? metaPorShot[index] : null;
+      const stats = calcularAnalisisShot(log, dosis);
 
       let tipo = log.isSteam ? "VAPOR" : "EXTRACCIÓN";
-      document.getElementById('chartTitle').innerText = `REGISTRO: ${tipo}`;
-      document.getElementById('statDur').innerText = log.duration + 's';
-      document.getElementById('statMaxT').innerText = log.maxT + '°C';
-      document.getElementById('statMaxP').innerText = log.maxP + ' bar';
-      let maxW = (log.weight && log.weight.length > 0) ? Math.max(...log.weight) : 0;
-      document.getElementById('statMaxW').innerText = maxW.toFixed(1) + ' g';
+      document.getElementById('chartTitle').innerText = `INFORME: ${tipo} #${index + 1}`;
+      document.getElementById('statDoseEditWrap').style.display = 'none';
+      document.getElementById('statDoseVal').style.display = 'block';
+
+      const metaParts = [];
+      if (meta) {
+        if (meta.bean) metaParts.push(`Grano: ${meta.bean}`);
+        if (meta.grind !== undefined) metaParts.push(`Molienda DF54: ${String(meta.grind).replace('.', ',')}`);
+        if (meta.extMode !== undefined) metaParts.push(meta.extMode == 1 ? 'Modo: BBW' : 'Modo: Flow Profiling');
+        if (meta.target) metaParts.push(`Meta: ${meta.target}°C`);
+        if (meta.sTemp > 0 || meta.sPres > 0) metaParts.push(`Nota T:${meta.sTemp}% P:${meta.sPres}%`);
+      }
+      document.getElementById('chartMetaRow').innerText = metaParts.join(' · ') || 'Curva muestreada cada 0.5s en memoria ESP32';
+
+      // Rellenar tarjetas analíticas
+      document.getElementById('btnEditDose').style.display = log.isSteam ? 'none' : 'inline-block';
+      if (log.isSteam) {
+        document.getElementById('statRatio').innerText = '--';
+        document.getElementById('statRatioSub').innerText = 'Modo vapor';
+        document.getElementById('statDoseVal').innerText = '--';
+        document.getElementById('statDoseSub').innerText = 'No aplica';
+      } else {
+        document.getElementById('statDoseVal').innerText = dosis > 0 ? `${dosis.toFixed(1)} g` : '-- g';
+        document.getElementById('statDoseSub').innerText = dosis > 0 ? 'Pulsa ✏️ para ajustar' : 'Pulsa ✏️ para asignar';
+        if (dosis > 0 && stats.maxW > 0) {
+          document.getElementById('statRatio').innerText = `1:${stats.finalRatio.toFixed(2)}`;
+          document.getElementById('statRatioSub').innerText = `EBF: ${stats.ebfPct.toFixed(1)}% · ${dosis.toFixed(1)}g → ${stats.maxW.toFixed(1)}g`;
+        } else if (stats.maxW > 0) {
+          document.getElementById('statRatio').innerText = 'Sin dosis';
+          document.getElementById('statRatioSub').innerText = 'Asigna dosis con ✏️';
+        } else {
+          document.getElementById('statRatio').innerText = '--';
+          document.getElementById('statRatioSub').innerText = 'Sin datos de peso';
+        }
+      }
+
+      document.getElementById('statMaxW').innerText = stats.maxW > 0 ? `${stats.maxW.toFixed(1)} g` : '-- g';
+      document.getElementById('statEndW').innerText = stats.maxW > 0 ? `Final: ${stats.endW.toFixed(1)} g` : 'Sin balanza';
+
+      document.getElementById('statDur').innerText = `${log.duration} s`;
+      if (stats.firstDropSec !== null) {
+        document.getElementById('statDurSub').innerText = `1ª gota: ${stats.firstDropSec.toFixed(1)}s · Flujo: ${stats.flowTimeSec.toFixed(1)}s`;
+      } else {
+        document.getElementById('statDurSub').innerText = '1ª gota: --';
+      }
+
+      document.getElementById('statFlowAvg').innerText = stats.avgFlow > 0 ? `${stats.avgFlow.toFixed(2)} g/s` : '-- g/s';
+      document.getElementById('statFlowPeak').innerText = stats.peakFlow > 0 ? `Pico: ${stats.peakFlow.toFixed(1)} g/s` : 'Sin flujo';
+
+      document.getElementById('statMaxT').innerText = stats.avgTVal > 0 ? `${stats.avgTVal.toFixed(1)}°C` : `${log.maxT}°C`;
+      document.getElementById('statTempSub').innerText = stats.avgTVal > 0 ? `${stats.minTVal.toFixed(1)}–${stats.maxTVal.toFixed(1)}°C (Δ${stats.deltaTVal.toFixed(1)}°)` : `Máx: ${log.maxT}°C`;
+
+      document.getElementById('statMaxP').innerText = `${log.maxP} bar`;
+      const presAvgTxt = stats.avgPMain > 0 ? `Prom ≥4b: ${stats.avgPMain.toFixed(1)}b (${stats.mainPresSec.toFixed(1)}s)` : (stats.avgPVal > 0 ? `Prom: ${stats.avgPVal.toFixed(1)} bar` : 'Sin presión');
+      document.getElementById('statPresSub').innerText = presAvgTxt;
+
+      // Renderizar hitos clave del shot
+      const msContainer = document.getElementById('chartMilestones');
+      msContainer.innerHTML = '';
+      if (stats.firstDropSec !== null) {
+        const chip = document.createElement('span');
+        chip.className = 'milestone-chip';
+        chip.style.borderColor = 'rgba(16, 185, 129, 0.5)';
+        chip.style.background = 'rgba(16, 185, 129, 0.12)';
+        chip.style.color = '#34d399';
+        chip.innerText = `💧 1ª gota: ${stats.firstDropSec.toFixed(1)}s`;
+        msContainer.appendChild(chip);
+      }
+      if (stats.peakPIdx >= 0 && stats.peakPVal > 1.5) {
+        const chip = document.createElement('span');
+        chip.className = 'milestone-chip';
+        chip.style.borderColor = 'rgba(52, 152, 219, 0.5)';
+        chip.style.background = 'rgba(52, 152, 219, 0.12)';
+        chip.style.color = '#60a5fa';
+        chip.innerText = `⚡ Pico ${stats.peakPVal.toFixed(1)}b @ ${(stats.peakPIdx * 0.5).toFixed(1)}s`;
+        msContainer.appendChild(chip);
+      }
+      stats.ratioMilestones.forEach((m) => {
+        const chip = document.createElement('span');
+        chip.className = 'milestone-chip';
+        chip.innerText = `⚖️ 1:${m.targetR} @ ${m.sec.toFixed(1)}s`;
+        msContainer.appendChild(chip);
+      });
+
       document.getElementById('chartModal').style.display = 'flex';
 
       const hCanvas = document.getElementById('historyCanvas');
       const hCtx = hCanvas.getContext('2d');
+      let w = 0, h = 0;
 
-      // Multiplicador de resolución DPI para evitar letras borrosas
-      const dpr = window.devicePixelRatio || 1;
-      hCanvas.width = hCanvas.clientWidth * dpr;
-      hCanvas.height = hCanvas.clientHeight * dpr;
-      hCtx.scale(dpr, dpr);
-      const w = hCanvas.clientWidth;
-      const h = hCanvas.clientHeight;
-
-      hCtx.clearRect(0, 0, w, h);
+      const resizeCanvas = () => {
+        const dpr = window.devicePixelRatio || 1;
+        w = hCanvas.clientWidth;
+        h = hCanvas.clientHeight;
+        hCanvas.width = Math.max(1, Math.floor(w * dpr));
+        hCanvas.height = Math.max(1, Math.floor(h * dpr));
+        hCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      };
+      resizeCanvas();
 
       let minT = Math.floor(Math.min(...log.temp) - 2);
       let maxT = Math.ceil(Math.max(...log.temp) + 2);
       let rangeT = maxT - minT; if (rangeT < 5) rangeT = 5;
 
+      const maxScaleW = Math.max(40, Math.ceil(stats.maxW / 10) * 10 + 10);
+      const maxScaleF = Math.max(3.0, Math.ceil(stats.peakFlow) + 0.5);
+      const maxRatioPeak = stats.ratioArr.length ? Math.max(...stats.ratioArr) : 0;
+      const maxScaleR = Math.max(2.5, Math.ceil(maxRatioPeak * 2) / 2 + 0.5);
+
+      const pad = { top: 18, right: 10, bottom: 22, left: 10 };
+
       window.updateGraphCursor = (cursorIndex = -1) => {
+        lastCursorIndex = cursorIndex;
         hCtx.clearRect(0, 0, w, h);
 
-        // 1. Cuadrícula y Ejes
+        const plotW = Math.max(10, w - pad.left - pad.right);
+        const plotH = Math.max(10, h - pad.top - pad.bottom);
+        const xFor = (i) => (stats.n > 1) ? pad.left + (i / (stats.n - 1)) * plotW : pad.left + plotW / 2;
+
+        // 1. Cuadrícula y Eje de Tiempo
         hCtx.strokeStyle = '#222'; hCtx.lineWidth = 1; hCtx.setLineDash([4, 4]);
         hCtx.beginPath();
-        for (let j = 1; j <= 3; j++) {
-          let yH = h * (j / 4);
-          hCtx.moveTo(0, yH); hCtx.lineTo(w, yH);
+        for (let j = 0; j <= 4; j++) {
+          let yH = pad.top + plotH * (j / 4);
+          hCtx.moveTo(pad.left, yH); hCtx.lineTo(pad.left + plotW, yH);
         }
         for (let j = 1; j <= 3; j++) {
-          let xW = w * (j / 4);
-          hCtx.moveTo(xW, 0); hCtx.lineTo(xW, h);
+          let xW = pad.left + plotW * (j / 4);
+          hCtx.moveTo(xW, pad.top); hCtx.lineTo(xW, pad.top + plotH);
         }
         hCtx.stroke(); hCtx.setLineDash([]);
 
-        // 2. Trazar Temperatura
-        hCtx.beginPath();
-        for (let i = 0; i < log.temp.length; i++) {
-          let x = (i / (log.temp.length - 1)) * w;
-          let y = h - ((log.temp[i] - minT) / rangeT) * h;
-          if (i === 0) hCtx.moveTo(x, y); else hCtx.lineTo(x, y);
+        hCtx.font = "11px monospace"; hCtx.fillStyle = "#64748b"; hCtx.textAlign = "center";
+        for (let j = 0; j <= 4; j++) {
+          const tVal = (log.duration * (j / 4)).toFixed(1) + "s";
+          const xLbl = pad.left + plotW * (j / 4);
+          hCtx.textAlign = (j === 0) ? "left" : (j === 4 ? "right" : "center");
+          hCtx.fillText(tVal, xLbl, h - 6);
         }
-        hCtx.strokeStyle = '#e67e22'; hCtx.lineWidth = 3; hCtx.stroke();
 
-        // 3. Trazar Presión
-        hCtx.beginPath();
-        for (let i = 0; i < log.pres.length; i++) {
-          let x = (i / (log.pres.length - 1)) * w;
-          let y = h - (log.pres[i] / 15) * h;
-          if (i === 0) hCtx.moveTo(x, y); else hCtx.lineTo(x, y);
+        // Líneas de referencia de Ratio (1:1 y 1:2) si la capa Ratio está activa y hay dosis
+        if (reportLayers.ratio && dosis > 0 && stats.maxW > 0) {
+          [1.0, 2.0].forEach((refR) => {
+            if (refR <= maxScaleR) {
+              const yRef = pad.top + plotH - (refR / maxScaleR) * plotH;
+              hCtx.save();
+              hCtx.strokeStyle = 'rgba(245, 158, 11, 0.25)';
+              hCtx.setLineDash([3, 5]);
+              hCtx.beginPath();
+              hCtx.moveTo(pad.left, yRef);
+              hCtx.lineTo(pad.left + plotW, yRef);
+              hCtx.stroke();
+              hCtx.fillStyle = 'rgba(245, 158, 11, 0.7)';
+              hCtx.font = 'bold 10px Arial';
+              hCtx.textAlign = 'center';
+              hCtx.fillText(`1:${refR}`, pad.left + plotW * 0.5, yRef - 3);
+              hCtx.restore();
+            }
+          });
         }
-        hCtx.strokeStyle = '#3498db'; hCtx.lineWidth = 3; hCtx.stroke();
 
-        // 3.5 Trazar Peso
-        if (log.weight && log.weight.length > 0) {
+        // Marcador vertical 1ª gota
+        if (stats.firstDropIdx >= 0) {
+          const xDrop = xFor(stats.firstDropIdx);
+          hCtx.save();
+          hCtx.strokeStyle = 'rgba(16, 185, 129, 0.45)';
+          hCtx.setLineDash([2, 3]);
           hCtx.beginPath();
-          for (let i = 0; i < log.weight.length; i++) {
-            let x = (i / (log.weight.length - 1)) * w;
-            let y = h - (log.weight[i] / 100) * h; // Escala 0-100 g
+          hCtx.moveTo(xDrop, pad.top);
+          hCtx.lineTo(xDrop, pad.top + plotH);
+          hCtx.stroke();
+          hCtx.fillStyle = '#34d399';
+          hCtx.font = 'bold 10px Arial';
+          hCtx.textAlign = xDrop > w * 0.8 ? 'right' : 'left';
+          hCtx.fillText(`💧${stats.firstDropSec.toFixed(1)}s`, xDrop + (xDrop > w * 0.8 ? -4 : 4), pad.top + 11);
+          hCtx.restore();
+        }
+
+        // 2. Trazar Temperatura
+        if (reportLayers.temp) {
+          hCtx.beginPath();
+          for (let i = 0; i < stats.n; i++) {
+            let x = xFor(i);
+            let y = pad.top + plotH - ((stats.temps[i] - minT) / rangeT) * plotH;
             if (i === 0) hCtx.moveTo(x, y); else hCtx.lineTo(x, y);
           }
-          hCtx.strokeStyle = '#10b981'; hCtx.lineWidth = 3; hCtx.stroke();
+          hCtx.strokeStyle = '#e67e22'; hCtx.lineWidth = 2.5; hCtx.stroke();
         }
 
-        // 4. Textos de la Escala NÍTIDOS
-        hCtx.font = "bold 13px Arial"; hCtx.textAlign = "left"; hCtx.fillStyle = "#e67e22";
-        for (let j = 0; j <= 4; j++) {
-          let tempVal = maxT - (rangeT * (j / 4));
-          let yPos = (h * (j / 4)) + (j === 0 ? 14 : (j === 4 ? -5 : 4));
-          hCtx.fillText(tempVal.toFixed(1) + "°C", 5, yPos);
+        // 3. Trazar Presión
+        if (reportLayers.pres) {
+          hCtx.beginPath();
+          for (let i = 0; i < stats.n; i++) {
+            let x = xFor(i);
+            let y = pad.top + plotH - (stats.press[i] / 15) * plotH;
+            if (i === 0) hCtx.moveTo(x, y); else hCtx.lineTo(x, y);
+          }
+          hCtx.strokeStyle = '#3498db'; hCtx.lineWidth = 2.5; hCtx.stroke();
         }
 
-        hCtx.textAlign = "right"; hCtx.fillStyle = "#3498db";
-        for (let j = 0; j <= 4; j++) {
-          let presVal = 15.0 - (15.0 * (j / 4));
-          let yPos = (h * (j / 4)) + (j === 0 ? 14 : (j === 4 ? -5 : 4));
-          hCtx.fillText(presVal.toFixed(1) + " bar", w - 5, yPos);
+        // 3.5 Trazar Peso
+        if (reportLayers.weight && stats.maxW > 0) {
+          hCtx.beginPath();
+          for (let i = 0; i < stats.n; i++) {
+            let x = xFor(i);
+            let y = pad.top + plotH - (Math.max(0, stats.weights[i]) / maxScaleW) * plotH;
+            if (i === 0) hCtx.moveTo(x, y); else hCtx.lineTo(x, y);
+          }
+          hCtx.strokeStyle = '#10b981'; hCtx.lineWidth = 2.5; hCtx.stroke();
+        }
+
+        // 3.6 Trazar Caudal (g/s)
+        if (reportLayers.flow && stats.peakFlow > 0) {
+          hCtx.beginPath();
+          for (let i = 0; i < stats.n; i++) {
+            let x = xFor(i);
+            let y = pad.top + plotH - (stats.flowArr[i] / maxScaleF) * plotH;
+            if (i === 0) hCtx.moveTo(x, y); else hCtx.lineTo(x, y);
+          }
+          hCtx.strokeStyle = '#38bdf8'; hCtx.lineWidth = 2; hCtx.stroke();
+        }
+
+        // 3.7 Trazar Ratio (1:X) + Puntos de Hito
+        if (reportLayers.ratio && dosis > 0 && stats.maxW > 0) {
+          hCtx.beginPath();
+          for (let i = 0; i < stats.n; i++) {
+            let x = xFor(i);
+            let y = pad.top + plotH - (stats.ratioArr[i] / maxScaleR) * plotH;
+            if (i === 0) hCtx.moveTo(x, y); else hCtx.lineTo(x, y);
+          }
+          hCtx.strokeStyle = '#f59e0b'; hCtx.lineWidth = 2.5; hCtx.stroke();
+
+          stats.ratioMilestones.forEach((m) => {
+            const mx = xFor(m.idx);
+            const my = pad.top + plotH - (stats.ratioArr[m.idx] / maxScaleR) * plotH;
+            hCtx.fillStyle = '#f59e0b';
+            hCtx.beginPath(); hCtx.arc(mx, my, 4, 0, Math.PI * 2); hCtx.fill();
+            hCtx.fillStyle = '#fef3c7';
+            hCtx.font = 'bold 10px Arial';
+            hCtx.textAlign = mx > w - 45 ? 'right' : 'left';
+            hCtx.fillText(`1:${m.targetR}`, mx + (mx > w - 45 ? -6 : 6), Math.max(pad.top + 10, my - 5));
+          });
+        }
+
+        // 4. Textos de Escala
+        hCtx.font = "bold 12px Arial"; hCtx.textAlign = "left";
+        if (reportLayers.temp) {
+          hCtx.fillStyle = "#e67e22";
+          for (let j = 0; j <= 4; j++) {
+            let tempVal = maxT - (rangeT * (j / 4));
+            let yPos = pad.top + (plotH * (j / 4)) + (j === 0 ? 10 : (j === 4 ? -4 : 4));
+            hCtx.fillText(tempVal.toFixed(1) + "°C", pad.left + 2, yPos);
+          }
+        }
+
+        hCtx.textAlign = "right";
+        if (reportLayers.pres) {
+          hCtx.fillStyle = "#3498db";
+          for (let j = 0; j <= 4; j++) {
+            let presVal = 15.0 - (15.0 * (j / 4));
+            let yPos = pad.top + (plotH * (j / 4)) + (j === 0 ? 10 : (j === 4 ? -4 : 4));
+            hCtx.fillText(presVal.toFixed(1) + " bar", w - pad.right - 2, yPos);
+          }
+        }
+
+        // Escala compacta de Peso / Caudal / Ratio en la parte superior
+        const topLegend = [];
+        if (reportLayers.weight && stats.maxW > 0) topLegend.push({ txt: `Peso:0-${maxScaleW}g`, col: '#10b981' });
+        if (reportLayers.flow && stats.peakFlow > 0) topLegend.push({ txt: `Flow:0-${maxScaleF.toFixed(1)}g/s`, col: '#38bdf8' });
+        if (reportLayers.ratio && dosis > 0 && stats.maxW > 0) topLegend.push({ txt: `Ratio:1:0–1:${maxScaleR.toFixed(1)}`, col: '#f59e0b' });
+        if (topLegend.length > 0) {
+          hCtx.font = "bold 11px Arial";
+          hCtx.textAlign = "center";
+          const spacing = plotW / (topLegend.length + 1);
+          topLegend.forEach((item, idx) => {
+            hCtx.fillStyle = item.col;
+            hCtx.fillText(item.txt, pad.left + spacing * (idx + 1), 12);
+          });
         }
 
         // 5. Cursor Interactivo
-        if (cursorIndex >= 0 && cursorIndex < log.temp.length) {
-          let curX = (cursorIndex / (log.temp.length - 1)) * w;
-          let curYTemp = h - ((log.temp[cursorIndex] - minT) / rangeT) * h;
-          let curYPres = h - (log.pres[cursorIndex] / 15) * h;
-          let curYWeight = (log.weight && log.weight.length > 0) ? h - (log.weight[cursorIndex] / 100) * h : -100;
+        if (cursorIndex >= 0 && cursorIndex < stats.n) {
+          let curX = xFor(cursorIndex);
+          let curYTemp = pad.top + plotH - ((stats.temps[cursorIndex] - minT) / rangeT) * plotH;
+          let curYPres = pad.top + plotH - (stats.press[cursorIndex] / 15) * plotH;
+          let curYWeight = stats.maxW > 0 ? pad.top + plotH - (Math.max(0, stats.weights[cursorIndex]) / maxScaleW) * plotH : -100;
+          let curYFlow = stats.peakFlow > 0 ? pad.top + plotH - (stats.flowArr[cursorIndex] / maxScaleF) * plotH : -100;
+          let curYRatio = (dosis > 0 && stats.maxW > 0) ? pad.top + plotH - (stats.ratioArr[cursorIndex] / maxScaleR) * plotH : -100;
 
-          hCtx.strokeStyle = '#fff'; hCtx.lineWidth = 1;
-          hCtx.beginPath(); hCtx.moveTo(curX, 0); hCtx.lineTo(curX, h); hCtx.stroke();
+          hCtx.strokeStyle = 'rgba(255,255,255,0.65)'; hCtx.lineWidth = 1;
+          hCtx.beginPath(); hCtx.moveTo(curX, pad.top); hCtx.lineTo(curX, pad.top + plotH); hCtx.stroke();
 
-          hCtx.fillStyle = '#e67e22'; hCtx.beginPath(); hCtx.arc(curX, curYTemp, 5, 0, Math.PI * 2); hCtx.fill();
-          hCtx.fillStyle = '#3498db'; hCtx.beginPath(); hCtx.arc(curX, curYPres, 5, 0, Math.PI * 2); hCtx.fill();
-          if (curYWeight >= 0) {
-            hCtx.fillStyle = '#10b981'; hCtx.beginPath(); hCtx.arc(curX, curYWeight, 5, 0, Math.PI * 2); hCtx.fill();
+          if (reportLayers.temp) { hCtx.fillStyle = '#e67e22'; hCtx.beginPath(); hCtx.arc(curX, curYTemp, 4.5, 0, Math.PI * 2); hCtx.fill(); }
+          if (reportLayers.pres) { hCtx.fillStyle = '#3498db'; hCtx.beginPath(); hCtx.arc(curX, curYPres, 4.5, 0, Math.PI * 2); hCtx.fill(); }
+          if (reportLayers.weight && curYWeight >= 0) { hCtx.fillStyle = '#10b981'; hCtx.beginPath(); hCtx.arc(curX, curYWeight, 4.5, 0, Math.PI * 2); hCtx.fill(); }
+          if (reportLayers.flow && curYFlow >= 0) { hCtx.fillStyle = '#38bdf8'; hCtx.beginPath(); hCtx.arc(curX, curYFlow, 4, 0, Math.PI * 2); hCtx.fill(); }
+          if (reportLayers.ratio && curYRatio >= 0) { hCtx.fillStyle = '#f59e0b'; hCtx.beginPath(); hCtx.arc(curX, curYRatio, 4.5, 0, Math.PI * 2); hCtx.fill(); }
+
+          const tooltipRows = [
+            { txt: `T: ${(cursorIndex * 0.5).toFixed(1)} s`, col: '#fff' },
+            { txt: `Temp: ${stats.temps[cursorIndex].toFixed(1)} °C`, col: '#e67e22' },
+            { txt: `Pres: ${stats.press[cursorIndex].toFixed(1)} bar`, col: '#3498db' }
+          ];
+          if (stats.maxW > 0) {
+            tooltipRows.push({ txt: `Peso: ${stats.weights[cursorIndex].toFixed(1)} g`, col: '#10b981' });
+            tooltipRows.push({ txt: `Flow: ${stats.flowArr[cursorIndex].toFixed(2)} g/s`, col: '#38bdf8' });
+          }
+          if (dosis > 0 && stats.maxW > 0) {
+            tooltipRows.push({ txt: `Ratio: 1:${stats.ratioArr[cursorIndex].toFixed(2)}`, col: '#f59e0b' });
           }
 
-          let boxX = curX > w / 2 ? curX - 110 : curX + 10;
-          hCtx.fillStyle = 'rgba(0,0,0,0.85)'; hCtx.fillRect(boxX, 10, 100, 68);
-          hCtx.strokeStyle = '#555'; hCtx.strokeRect(boxX, 10, 100, 68);
-          hCtx.textAlign = "left"; hCtx.font = "bold 12px Arial";
-          hCtx.fillStyle = '#fff'; hCtx.fillText("T: " + (cursorIndex * 0.5).toFixed(1) + "s", boxX + 5, 25);
-          hCtx.fillStyle = '#e67e22'; hCtx.fillText(log.temp[cursorIndex].toFixed(1) + "°C", boxX + 5, 40);
-          hCtx.fillStyle = '#3498db'; hCtx.fillText(log.pres[cursorIndex].toFixed(1) + " bar", boxX + 5, 55);
-          if (log.weight && log.weight.length > 0) {
-            hCtx.fillStyle = '#10b981'; hCtx.fillText(log.weight[cursorIndex].toFixed(1) + " g", boxX + 5, 70);
-          }
+          const boxW = 122;
+          const boxH = 12 + tooltipRows.length * 16;
+          let boxX = curX > w / 2 ? curX - boxW - 12 : curX + 12;
+          if (boxX < 6) boxX = 6;
+          if (boxX + boxW > w - 6) boxX = w - boxW - 6;
+          const boxY = Math.min(pad.top + 8, h - pad.bottom - boxH - 4);
+
+          hCtx.fillStyle = 'rgba(10, 10, 10, 0.9)'; hCtx.fillRect(boxX, boxY, boxW, boxH);
+          hCtx.strokeStyle = '#555'; hCtx.strokeRect(boxX, boxY, boxW, boxH);
+          hCtx.textAlign = "left"; hCtx.font = "bold 12px monospace";
+          tooltipRows.forEach((row, rIdx) => {
+            hCtx.fillStyle = row.col;
+            hCtx.fillText(row.txt, boxX + 7, boxY + 17 + rIdx * 16);
+          });
         }
       };
 
-      window.updateGraphCursor();
+      window.updateGraphCursor(-1);
 
       const moveCursor = (e) => {
         let rect = hCanvas.getBoundingClientRect();
         let clientX = e.touches ? e.touches[0].clientX : e.clientX;
         let mouseX = clientX - rect.left;
-        let index = Math.round((mouseX / rect.width) * (log.temp.length - 1));
-        if (index < 0) index = 0; if (index >= log.temp.length) index = log.temp.length - 1;
-        window.updateGraphCursor(index);
+        const plotW = Math.max(10, rect.width - pad.left - pad.right);
+        let rel = (mouseX - pad.left) / plotW;
+        let idx = Math.round(rel * (stats.n - 1));
+        if (idx < 0) idx = 0;
+        if (idx >= stats.n) idx = stats.n - 1;
+        window.updateGraphCursor(idx);
       };
 
       hCanvas.onmousemove = moveCursor;
       hCanvas.ontouchmove = (e) => { e.preventDefault(); moveCursor(e); };
       hCanvas.onmouseleave = () => window.updateGraphCursor(-1);
       hCanvas.ontouchend = () => window.updateGraphCursor(-1);
+
+      if (chartResizeHandler) window.removeEventListener('resize', chartResizeHandler);
+      chartResizeHandler = () => {
+        if (document.getElementById('chartModal').style.display === 'flex') {
+          resizeCanvas();
+          window.updateGraphCursor(lastCursorIndex);
+        }
+      };
+      window.addEventListener('resize', chartResizeHandler);
     }
+
+    document.getElementById('chartModal').addEventListener('click', (e) => {
+      if (e.target && e.target.id === 'chartModal') cerrarChartModal();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.getElementById('chartModal').style.display === 'flex') {
+        cerrarChartModal();
+      }
+    });
     fetchAndRenderHistory(); // <-- Pide los datos a la ESP32 al abrir la web
 
     function pedirDatos() {
-      fetch('http://192.168.1.68/status').then(r => r.json()).then(d => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1500);
+      fetch('http://192.168.1.68/status', { signal: controller.signal }).then(r => {
+        clearTimeout(timeoutId);
+        return r.json();
+      }).then(d => {
         document.getElementById('valTemp').innerHTML = d.actual.toFixed(1) + '<span class="unit">°C</span>';
         let currentPres = d.presion || 0;
 
@@ -1064,6 +1699,15 @@
 
           // Al apagar la bomba, la web le pide a la ESP32 su memoria actualizada
           if (ultimaDosisPesada > 0) pendingLinkDose = true;
+          const activeProf = (typeof perfilesBbw !== 'undefined' && perfilesBbw[perfilActivo]) ? perfilesBbw[perfilActivo] : null;
+          pendingShotMeta = {
+            target: Math.round(d.objetivo || state.target || 0),
+            grind: d.grind,
+            extMode: d.extMode,
+            sTemp: d.sTemp || 0,
+            sPres: d.sPres || 0,
+            bean: activeProf ? (activeProf.bean || '') : ''
+          };
           setTimeout(fetchAndRenderHistory, 1500);
         }
         wasPumpOn = state.pmp;
@@ -1173,6 +1817,7 @@
 
         setTimeout(pedirDatos, 100); // Consulta ultra-rápida (100ms)
       }).catch(e => {
+        clearTimeout(timeoutId);
         console.log(e);
         setTimeout(pedirDatos, 350); // Pausa protectora si el servidor está ocupado
       });
@@ -1194,6 +1839,7 @@
     let dosisRegistrada = (ultimaDosisPesada > 0 && localStorage.getItem('ikape_dosis_registrada') === '1');
     let pesoGranosActual = 0;
     let ikapeOnline = false;
+    let ikapePollSeq = 0;
 
     function mostrarToastIkape(msg, color) {
       let t = document.getElementById('toast');
@@ -1281,6 +1927,7 @@
     }
 
     function tararBalanzaGranos() {
+      ikapePollSeq++;
       fetch('http://192.168.1.190/tare')
         .then(r => r.text())
         .then(res => {
@@ -1300,6 +1947,7 @@
     }
 
     function pedirDatosBalanzaGranos() {
+      const seq = ikapePollSeq;
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 1500);
 
@@ -1310,6 +1958,10 @@
           return r.json();
         })
         .then(b => {
+          if (seq !== ikapePollSeq) {
+            setTimeout(pedirDatosBalanzaGranos, 250);
+            return;
+          }
           ikapeOnline = true;
           const dot = document.getElementById('ikapeStatusDot');
           const valEl = document.getElementById('valGranos');
