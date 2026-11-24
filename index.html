@@ -1641,6 +1641,32 @@
       return construirDiagnosticoShot(log, stats, meta, dosis);
     }
 
+    function obtenerDatosFreno(log, meta) {
+      if (meta && meta.brake) return meta.brake;
+      if (log && log.brake) return log.brake;
+      return null;
+    }
+
+    function formatearFrenoInfo(brake) {
+      if (!brake) return null;
+      const displaySec = (brake.contactSec !== null && brake.contactSec !== undefined && Number(brake.contactSec) > 0)
+        ? Number(brake.contactSec)
+        : Number(brake.graphSec || 0);
+      const graphSec = Number(brake.graphSec !== undefined ? brake.graphSec : displaySec);
+      const tempTxt = brake.temp !== undefined ? `${Number(brake.temp).toFixed(1)}°C` : '';
+      const presTxt = brake.pres !== undefined ? `${Number(brake.pres).toFixed(1)}b` : '';
+      const weightTxt = (brake.weight !== undefined && Number(brake.weight) > 0) ? `${Number(brake.weight).toFixed(1)}g` : '';
+      const metrics = [tempTxt, presTxt, weightTxt].filter(Boolean).join(' · ');
+      return {
+        displaySec,
+        graphSec,
+        secText: `${displaySec.toFixed(1)}s`,
+        chipText: `🛑 Freno: ${displaySec.toFixed(1)}s${metrics ? ` (${metrics})` : ''}`,
+        cardText: `🛑 Freno: ${displaySec.toFixed(1)}s${tempTxt ? ` (${tempTxt})` : ''}`,
+        metaText: `Freno: ${displaySec.toFixed(1)}s${tempTxt ? ` (${tempTxt}${presTxt ? ` · ${presTxt}` : ''})` : ''}`
+      };
+    }
+
     function renderHistoryCards() {
       const container = document.getElementById('historyList');
       if (!globalHistory || globalHistory.length === 0) {
@@ -1658,7 +1684,9 @@
         const rawDose = (typeof dosisPorShot !== 'undefined') ? parseFloat(dosisPorShot[originalIndex]) : NaN;
         const dosisGuardada = (!log.isSteam && rawDose > 0) ? rawDose : 0;
         const stats = calcularAnalisisShot(log, dosisGuardada);
+        const meta = (!log.isSteam && metaPorShot[originalIndex]) ? metaPorShot[originalIndex] : null;
         const diag = obtenerDiagnosticoParaLog(log, originalIndex, stats, dosisGuardada);
+        const brakeInfo = !log.isSteam ? formatearFrenoInfo(obtenerDatosFreno(log, meta)) : null;
 
         let lineaGranos = '';
         if (!log.isSteam && dosisGuardada > 0) {
@@ -1674,6 +1702,12 @@
           <div>Dur: ${log.duration}s${yieldTxt}</div>
           <div>Max T: ${log.maxT}°C · Max P: ${log.maxP} bar</div>
         `;
+        if (brakeInfo) {
+          const brakeLine = document.createElement('div');
+          brakeLine.style.cssText = 'color:#f87171; font-size:11px;';
+          brakeLine.textContent = brakeInfo.cardText;
+          card.appendChild(brakeLine);
+        }
         const verdictEl = document.createElement('div');
         verdictEl.className = `history-card-verdict ${verdictClass}`;
         verdictEl.textContent = diag.shortBadge;
@@ -1937,17 +1971,20 @@
       const dosis = (currentChartId !== null && parseFloat(dosisPorShot[currentChartId]) > 0)
         ? parseFloat(dosisPorShot[currentChartId])
         : (activeReportDosis || 0);
+      const brake = obtenerDatosFreno(log, activeReportMeta);
       const stats = calcularAnalisisShot(log, dosis);
-      const lines = ['Tiempo(s),Temperatura(C),Presion(Bar),Peso(g),Caudal(g/s),Ratio(1:X),Dosis(g)'];
+      const lines = ['Tiempo(s),Temperatura(C),Presion(Bar),Peso(g),Caudal(g/s),Ratio(1:X),Dosis(g),Freno'];
       for (let i = 0; i < stats.n; i++) {
-        const t = (i * 0.5).toFixed(1);
+        const tNum = i * 0.5;
+        const t = tNum.toFixed(1);
         const temp = Number(stats.temps[i] || 0).toFixed(1);
         const pres = Number(stats.press[i] || 0).toFixed(1);
         const w = Number(stats.weights[i] || 0).toFixed(1);
         const flow = Number(stats.flowArr[i] || 0).toFixed(2);
         const ratio = dosis > 0 ? Number(stats.ratioArr[i] || 0).toFixed(2) : '';
         const dStr = dosis > 0 ? dosis.toFixed(1) : '';
-        lines.push(`${t},${temp},${pres},${w},${flow},${ratio},${dStr}`);
+        const frenoVal = (brake && tNum >= (Number(brake.graphSec || 0) - 0.25)) ? '1' : '0';
+        lines.push(`${t},${temp},${pres},${w},${flow},${ratio},${dStr},${frenoVal}`);
       }
       const blob = new Blob([lines.join('\n') + '\n'], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
@@ -2007,6 +2044,7 @@
       const hCtx = hCanvas.getContext('2d');
       const isLiveRunning = Boolean(options.isLiveRunning);
       const targetTempRef = Number(options.targetTemp || 0);
+      const brakeInfo = formatearFrenoInfo(options.brake);
       let w = 0, h = 0;
 
       const resizeCanvas = () => {
@@ -2046,6 +2084,11 @@
         const xFor = (i) => (stats.n <= 1 && !isLiveRunning)
           ? pad.left + plotW / 2
           : pad.left + (i / totalSteps) * plotW;
+        const xForSec = (sec) => {
+          const spanSec = Math.max(0.5, totalSteps * 0.5);
+          const clamped = Math.max(0, Math.min(Number(sec || 0), spanSec));
+          return pad.left + (clamped / spanSec) * plotW;
+        };
 
         // 1. Cuadrícula y Eje de Tiempo
         hCtx.strokeStyle = '#222'; hCtx.lineWidth = 1; hCtx.setLineDash([4, 4]);
@@ -2120,6 +2163,24 @@
           hCtx.font = 'bold 10px Arial';
           hCtx.textAlign = xDrop > w * 0.8 ? 'right' : 'left';
           hCtx.fillText(`💧${stats.firstDropSec.toFixed(1)}s`, xDrop + (xDrop > w * 0.8 ? -4 : 4), pad.top + 11);
+          hCtx.restore();
+        }
+
+        // Marcador vertical momento en que se presionó el freno
+        if (brakeInfo) {
+          const xBrake = xForSec(brakeInfo.graphSec);
+          hCtx.save();
+          hCtx.strokeStyle = 'rgba(248, 113, 113, 0.72)';
+          hCtx.lineWidth = 1.5;
+          hCtx.setLineDash([4, 3]);
+          hCtx.beginPath();
+          hCtx.moveTo(xBrake, pad.top);
+          hCtx.lineTo(xBrake, pad.top + plotH);
+          hCtx.stroke();
+          hCtx.fillStyle = '#f87171';
+          hCtx.font = 'bold 10px Arial';
+          hCtx.textAlign = xBrake > w * 0.78 ? 'right' : 'left';
+          hCtx.fillText(`🛑${brakeInfo.secText}`, xBrake + (xBrake > w * 0.78 ? -4 : 4), pad.top + 24);
           hCtx.restore();
         }
 
@@ -2243,8 +2304,11 @@
           if (dosis > 0 && stats.maxW > 0) {
             tooltipRows.push({ txt: `Ratio: 1:${stats.ratioArr[cursorIndex].toFixed(2)}`, col: '#f59e0b' });
           }
+          if (brakeInfo && (cursorIndex * 0.5) >= (brakeInfo.graphSec - 0.25)) {
+            tooltipRows.push({ txt: `Freno: ACTIVO (${brakeInfo.secText})`, col: '#f87171' });
+          }
 
-          const boxW = 122;
+          const boxW = brakeInfo ? 148 : 122;
           const boxH = 12 + tooltipRows.length * 16;
           let boxX = curX > w / 2 ? curX - boxW - 12 : curX + 12;
           if (boxX < 6) boxX = 6;
@@ -2351,6 +2415,8 @@
         if (csvBtn) csvBtn.hidden = false;
       }
 
+      const brake = obtenerDatosFreno(log, meta);
+      const brakeInfo = formatearFrenoInfo(brake);
       const metaParts = [];
       if (meta) {
         if (meta.bean) metaParts.push(`Grano: ${meta.bean}`);
@@ -2359,6 +2425,7 @@
         if (meta.target) metaParts.push(`Meta: ${meta.target}°C`);
         if (meta.sTemp > 0 || meta.sPres > 0) metaParts.push(`Nota T:${meta.sTemp}% P:${meta.sPres}%`);
       }
+      if (brakeInfo) metaParts.push(brakeInfo.metaText);
       document.getElementById('chartMetaRow').innerText = metaParts.join(' · ') || 'Curva muestreada cada 0.5s en memoria ESP32';
 
       const isLive = (mode === 'live');
@@ -2470,6 +2537,15 @@
         chip.innerText = `💧 1ª gota: ${stats.firstDropSec.toFixed(1)}s`;
         msContainer.appendChild(chip);
       }
+      if (brakeInfo) {
+        const chip = document.createElement('span');
+        chip.className = 'milestone-chip';
+        chip.style.borderColor = 'rgba(248, 113, 113, 0.55)';
+        chip.style.background = 'rgba(239, 68, 68, 0.14)';
+        chip.style.color = '#fca5a5';
+        chip.innerText = brakeInfo.chipText;
+        msContainer.appendChild(chip);
+      }
       if (stats.peakPIdx >= 0 && stats.peakPVal > 1.5) {
         const chip = document.createElement('span');
         chip.className = 'milestone-chip';
@@ -2489,7 +2565,8 @@
       renderReportCanvas(log, stats, dosis, {
         isLiveRunning: isLive,
         targetTemp: meta ? meta.target : (liveStatus ? liveStatus.objetivo : 0),
-        targetWeight: meta ? meta.tWeight : (liveStatus ? liveStatus.tWeight : 0)
+        targetWeight: meta ? meta.tWeight : (liveStatus ? liveStatus.tWeight : 0),
+        brake
       });
     }
 
@@ -2717,6 +2794,13 @@
               duration: 0,
               expTime: Number(d.expTime || 30),
               tWeight: Number(d.tWeight || 0),
+              brake: (d.freno == 1) ? {
+                graphSec: 0,
+                contactSec: d.tiempo > 0 ? Number(d.tiempo.toFixed(1)) : null,
+                temp: Number(d.actual.toFixed(1)),
+                pres: Number(currentPres.toFixed(1)),
+                weight: Number(currentPeso.toFixed(1))
+              } : null,
               temp: [Number(d.actual)],
               pres: [currentPres],
               weight: [currentPeso]
@@ -2728,7 +2812,8 @@
               extMode: d.extMode,
               expTime: Number(d.expTime || 30),
               tWeight: Number(d.tWeight || 0),
-              bean: activeProf ? (activeProf.bean || '') : ''
+              bean: activeProf ? (activeProf.bean || '') : '',
+              brake: liveExtraction.brake
             };
             const liveStats = calcularAnalisisShot(liveExtraction, ultimaDosisPesada > 0 ? ultimaDosisPesada : 0);
             renderReportModalView({
@@ -2750,6 +2835,15 @@
             if (currentPeso > liveExtraction.maxW) liveExtraction.maxW = currentPeso;
             liveExtraction.duration = Number((Math.max(0, liveExtraction.temp.length - 1) * 0.5).toFixed(1));
             if (d.tiempo > 0) liveExtraction.contactTime = Number(d.tiempo.toFixed(1));
+            if (d.freno == 1 && !liveExtraction.brake) {
+              liveExtraction.brake = {
+                graphSec: Number(((nowMs - liveExtraction.startedAt) / 1000).toFixed(1)),
+                contactSec: d.tiempo > 0 ? Number(d.tiempo.toFixed(1)) : null,
+                temp: Number(d.actual.toFixed(1)),
+                pres: Number(currentPres.toFixed(1)),
+                weight: Number(currentPeso.toFixed(1))
+              };
+            }
 
             if (nowMs - liveExtraction.lastSampleAt >= 500) {
               liveExtraction.temp.push(Number(d.actual));
@@ -2770,7 +2864,8 @@
                 extMode: d.extMode,
                 expTime: Number(d.expTime || 30),
                 tWeight: Number(d.tWeight || 0),
-                bean: activeProf ? (activeProf.bean || '') : ''
+                bean: activeProf ? (activeProf.bean || '') : '',
+                brake: liveExtraction.brake
               };
               const liveStats = calcularAnalisisShot(liveExtraction, ultimaDosisPesada > 0 ? ultimaDosisPesada : 0);
               renderReportModalView({
@@ -2830,6 +2925,7 @@
                 sTemp: d.sTemp || 0,
                 sPres: d.sPres || 0,
                 bean: activeProf ? (activeProf.bean || '') : '',
+                brake: (liveExtraction && liveExtraction.brake) ? liveExtraction.brake : null,
                 diag
               };
               scheduleHistorySyncAfterShot(Boolean(liveExtraction && liveExtraction.sawSmartTimer));
