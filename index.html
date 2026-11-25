@@ -805,6 +805,209 @@
       opacity: 1;
       bottom: 40px;
     }
+
+    /* --- HUB INTELIGENTE IKAPE, BÓVEDA DE CAFÉS Y FILTRADOS --- */
+    dialog.app-dialog {
+      border: 1px solid #334155;
+      border-radius: 10px;
+      margin: auto;
+      padding: 0;
+      background: #141414;
+      color: var(--text);
+      inline-size: min(96vw, 860px);
+      max-block-size: 92dvh;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+    }
+
+    dialog.app-dialog[open] {
+      display: flex;
+      flex-direction: column;
+    }
+
+    dialog.app-dialog:modal {
+      overscroll-behavior: contain;
+    }
+
+    dialog.app-dialog::backdrop {
+      overflow: hidden;
+      overscroll-behavior: contain;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(2px);
+    }
+
+    .app-dialog-shell {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      max-block-size: 92dvh;
+    }
+
+    input[type="checkbox"][switch] {
+      accent-color: var(--accent);
+      margin: 0;
+      cursor: pointer;
+      min-inline-size: 18px;
+      min-block-size: 18px;
+    }
+
+    input[type="checkbox"][switch]:focus-visible,
+    .vault-field input:focus-visible,
+    .vault-field select:focus-visible,
+    .btn:focus-visible,
+    .ikape-mini-btn:focus-visible {
+      outline: 3px solid #f59e0b;
+      outline-offset: 3px;
+    }
+
+    .ikape-switch-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      padding-top: 8px;
+      margin-top: 8px;
+      border-top: 1px dashed #2b2b2b;
+      font-size: 11px;
+      color: #cbd5e1;
+    }
+
+    .ikape-switch-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-block-size: var(--target-size);
+      cursor: pointer;
+    }
+
+    .ikape-mini-btn {
+      background: #242424;
+      border: 1px solid #4b5563;
+      color: #f8fafc;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      min-block-size: var(--target-size);
+    }
+
+    .ikape-mini-btn:hover {
+      border-color: var(--accent);
+    }
+
+    .dose-progress-track {
+      inline-size: 100%;
+      block-size: 6px;
+      background: #1f2937;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .dose-progress-fill {
+      block-size: 100%;
+      inline-size: 0%;
+      background: #f59e0b;
+      transition: inline-size 0.18s ease, background-color 0.18s ease;
+    }
+
+    .bean-vault-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
+      gap: 10px;
+    }
+
+    .bean-card {
+      background: #1b1b1b;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .bean-card.is-active {
+      border-color: #f59e0b;
+      box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.35);
+      background: #211d15;
+    }
+
+    .fresh-badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: bold;
+      border: 1px solid #475569;
+    }
+
+    .fresh-opt { color: #6ee7b7; background: rgba(16, 185, 129, 0.14); border-color: rgba(16, 185, 129, 0.45); }
+    .fresh-degas { color: #7dd3fc; background: rgba(56, 189, 248, 0.14); border-color: rgba(56, 189, 248, 0.45); }
+    .fresh-aging { color: #fde68a; background: rgba(245, 158, 11, 0.14); border-color: rgba(245, 158, 11, 0.45); }
+    .fresh-old { color: #fca5a5; background: rgba(239, 68, 68, 0.14); border-color: rgba(239, 68, 68, 0.45); }
+
+    .vault-form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .vault-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .vault-field label {
+      font-size: 11px;
+      color: #cbd5e1;
+      font-weight: bold;
+    }
+
+    .vault-field input,
+    .vault-field select {
+      background: #0d0d0d;
+      border: 1px solid #4b5563;
+      color: #f8fafc;
+      border-radius: 5px;
+      padding: 7px 8px;
+      font-size: max(14px, 0.9rem);
+      min-block-size: 38px;
+      inline-size: 100%;
+    }
+
+    .vault-field input:user-invalid {
+      border-color: var(--danger);
+    }
+
+    .po-stage-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+      gap: 8px;
+    }
+
+    .po-stage-chip {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 8px;
+      font-size: 11px;
+    }
+
+    .po-stage-chip.is-current {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+      color: #e0f2fe;
+    }
+
+    .po-stage-chip.is-done {
+      border-color: rgba(16, 185, 129, 0.45);
+      color: #6ee7b7;
+    }
   </style>
 </head>
 
@@ -887,30 +1090,56 @@
 
       <canvas id="graphCanvas" style="display: block; margin-top: 12px;"></canvas>
 
-      <!-- MONITOR BALANZA IKAPE (PESO GRANOS ANTES DE MOLER) -->
+      <!-- HUB INTELIGENTE BALANZA IKAPE (.190: GRANOS, AUTO-DOSIS, BÓVEDA Y FILTRADOS) -->
       <div
-        style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; background: #111; padding: 10px 14px; border-radius: 6px; border: 1px solid #333;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <div>
-            <div style="color:#888; font-size:11px;">PESO GRANOS (IKAPE) <span id="ikapeStatusDot"
-                style="color:#555;">●</span></div>
-            <div style="display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap;">
-              <button onclick="tararBalanzaGranos()"
-                style="background: #2a2a2a; border: 1px solid #555; color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer;">TARE
-                0.0g</button>
-              <button id="btnRegistrarDosis" onclick="registrarDosisGranos()"
-                style="background: #2a2a2a; border: 1px solid #f59e0b; color: #f59e0b; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer;">✔
-                REGISTRAR DOSIS</button>
+        style="margin-top: 12px; background: #111; padding: 12px 14px; border-radius: 6px; border: 1px solid #333;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap;">
+          <div style="flex: 1 1 230px;">
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; color:#94a3b8; font-size:11px; font-weight:bold;">
+              <span>HUB BALANZA IKAPE</span>
+              <span id="ikapeStatusDot" style="color:#555;">●</span>
+              <span id="valIkapeBat" style="display:none; color:#2ecc71; font-size:10px;">(🔋 --%)</span>
+              <span id="ikapeM2mBadge" style="display:none; color:#38bdf8; background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.35); padding:1px 6px; border-radius:999px; font-size:10px;">🔗 M2M Oster</span>
+              <span id="valIkapeStable" style="display:none; color:#6ee7b7; font-size:10px;">● Estable</span>
+            </div>
+            <div id="ikapeAutoDoseHint" style="font-size: 11px; color: #94a3b8; margin-top: 4px;">
+              Esperando conexión con ESP32 IKAPE (.190)...
+            </div>
+            <div style="display: flex; gap: 6px; margin-top: 7px; flex-wrap: wrap;">
+              <button type="button" class="ikape-mini-btn" onclick="tararBalanzaGranos()">TARE 0.0g</button>
+              <button type="button" id="btnRegistrarDosis" class="ikape-mini-btn" style="border-color:#f59e0b; color:#f59e0b;" onclick="registrarDosisGranos()">✔ REGISTRAR DOSIS</button>
+              <button type="button" class="ikape-mini-btn" style="border-color:#a78bfa; color:#ddd6fe;" onclick="abrirBovedaCafes()">🫘 BÓVEDA CAFÉS</button>
+              <button type="button" class="ikape-mini-btn" style="border-color:#38bdf8; color:#7dd3fc;" onclick="abrirEstacionFiltrados()">🫖 V60 / FILTRADOS</button>
+            </div>
+          </div>
+
+          <div style="text-align: right; min-inline-size: 135px;">
+            <div id="valGranos" style="font-size: 28px; font-weight: bold; color: #f59e0b;">0.0<span class="unit">g</span></div>
+            <div style="font-size: 11px; color: #38bdf8; font-weight: bold;" id="valIkapeFlow">0.0 <span style="color:#888; font-weight:normal;">g/s</span></div>
+            <div style="font-size: 11px; color: #888; margin-top: 2px;">Dosis: <span id="valDosisShot" style="color: #e0e0e0; font-weight: bold;">-- g</span>
+              <button type="button" id="btnLimpiarDosis" onclick="limpiarDosisRegistrada()" title="Borrar dosis registrada"
+                style="display: none; background: transparent; border: none; color: #e74c3c; font-size: 11px; cursor: pointer; padding: 0 3px;">✖</button>
             </div>
           </div>
         </div>
-        <div style="text-align: right;">
-          <div id="valGranos" style="font-size: 28px; font-weight: bold; color: #f59e0b;">0.0<span class="unit">g</span>
+
+        <div class="dose-progress-track" title="Progreso hacia la dosis objetivo del grano activo">
+          <div id="ikapeDoseBarFill" class="dose-progress-fill"></div>
+        </div>
+
+        <div id="ikapeActiveBeanBar" style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-top:7px; font-size:11px; color:#cbd5e1;">
+          <span id="ikapeBeanSummary">🫘 Grano activo: <b style="color:#fbbf24;">Cargando bóveda...</b></span>
+          <span id="ikapeTargetRatioHint" style="color:#10b981; font-weight:bold;">Meta BBW: --</span>
+        </div>
+
+        <div class="ikape-switch-row">
+          <div class="ikape-switch-item">
+            <input id="swAutoWake" name="autoWake" type="checkbox" switch checked onchange="cambiarConfigIkape()">
+            <label for="swAutoWake">⚡ Auto-Wake Cafetera al pesar</label>
           </div>
-          <div style="font-size: 11px; color: #888;">Dosis registrada: <span id="valDosisShot"
-              style="color: #e0e0e0; font-weight: bold;">-- g</span> <button id="btnLimpiarDosis"
-              onclick="limpiarDosisRegistrada()" title="Borrar dosis registrada"
-              style="display: none; background: transparent; border: none; color: #e74c3c; font-size: 11px; cursor: pointer; padding: 0 2px;">✖</button>
+          <div class="ikape-switch-item">
+            <input id="swAutoDose" name="autoDose" type="checkbox" switch checked onchange="cambiarConfigIkape()">
+            <label for="swAutoDose">🤖 Auto-Dosis manos libres</label>
           </div>
         </div>
       </div>
@@ -921,6 +1150,7 @@
         <div style="text-align: center; width: 32%;">
           <div style="color:#888; font-size:11px;">TANQUE AGUA</div>
           <div id="valTank" style="color:#3498db; font-size:15px; font-weight:bold; margin-top:2px;">-- ml</div>
+          <button type="button" onclick="recargarTanqueWeb()" style="margin-top:3px; background:#1e293b; border:1px solid #38bdf8; color:#7dd3fc; border-radius:4px; font-size:10px; padding:1px 6px; cursor:pointer;">💧 Llenar 1L</button>
         </div>
         <div style="width: 1px; background: #333; height: 30px;"></div>
         <div style="text-align: center; width: 32%;">
@@ -952,6 +1182,10 @@
       <button class="btn" style="background: #222; color: #aaa; border-color: #444; margin-bottom: 10px;"
         onclick="document.getElementById('modalBbw').style.display='flex'; if(typeof cargarPerfil === 'function') cargarPerfil(perfilActivo, false);">⚖️
         PERFILES BREW BY WEIGHT</button>
+      <button type="button" class="btn" style="background: #222; color: #ddd6fe; border-color: #8b5cf6; margin-bottom: 10px;"
+        onclick="abrirBovedaCafes()">🫘 BÓVEDA CAFÉS (IKAPE)</button>
+      <button type="button" class="btn" style="background: #222; color: #7dd3fc; border-color: #0284c7; margin-bottom: 10px;"
+        onclick="abrirEstacionFiltrados()">🫖 ESTACIÓN V60 / FILTRADOS</button>
 
       <button class="btn" style="background: #222; color: #aaa; border-color: #444; margin-bottom: 10px;"
         onclick="document.getElementById('modalEng').style.display='flex'; switchTab('t-rep');">⚙️ INGENIERÍA
@@ -986,12 +1220,21 @@
         </div>
         <hr style="border: 0; border-top: 1px solid #333; margin: 10px 0;">
 
-        <div class="setting-group"><label>Pre-infusión (s)</label><input type="number" id="wPre"></div>
-        <div class="setting-group"><label>Pausa Bloom (s)</label><input type="number" id="wPausa"></div>
-        <div class="setting-group"><label>Tiempo Meta (s)</label><input type="number" id="wExp"></div>
-        <div class="setting-group"><label>Peso Límite (g)</label><input type="number" id="wWeight" step="0.1"></div>
+        <div class="setting-group"><label for="wPre">Pre-infusión (s)</label><input type="number" id="wPre"></div>
+        <div class="setting-group"><label for="wPausa">Pausa Bloom (s)</label><input type="number" id="wPausa"></div>
+        <div class="setting-group"><label for="wExp">Tiempo Meta (s)</label><input type="number" id="wExp"></div>
         <hr style="border: 0; border-top: 1px solid #333; margin: 10px 0;">
-        <div class="setting-group"><label>Puntos Molienda</label><input type="number" id="wGrind" step="0.1" min="0"
+        <div class="setting-group" style="gap: 8px;">
+          <label for="wUseRatio" style="color:#fbbf24; font-weight:bold;">Corte por Ratio IKAPE (1:X)</label>
+          <input type="checkbox" id="wUseRatio" switch checked onchange="actualizarPreviewRatioBbw()">
+        </div>
+        <div class="setting-group"><label for="wRatio">Ratio Objetivo (1:X)</label><input type="number" id="wRatio" step="0.1" min="1.0" max="4.0" value="2.0" oninput="actualizarPreviewRatioBbw()"></div>
+        <div class="setting-group"><label for="wWeight">Peso Fijo Respaldo (g)</label><input type="number" id="wWeight" step="0.1" oninput="actualizarPreviewRatioBbw()"></div>
+        <div id="wEffectivePreview" style="font-size:11px; color:#10b981; background:#111; border:1px solid #2b2b2b; border-radius:5px; padding:6px 8px; margin-bottom:8px;">
+          Meta efectiva BBW: -- g
+        </div>
+        <hr style="border: 0; border-top: 1px solid #333; margin: 10px 0;">
+        <div class="setting-group"><label for="wGrind">Puntos Molienda</label><input type="number" id="wGrind" step="0.1" min="0"
             max="9.0"></div>
         <button class="btn-save" onclick="saveBbw(); document.getElementById('modalBbw').style.display='none';">GUARDAR
           Y APLICAR PERFIL</button>
@@ -1177,6 +1420,175 @@
     </div>
   </dialog>
 
+  <!-- MODAL NATIVO: BÓVEDA DE CAFÉS & RECETAS (MEMORIA NVS ESP32 IKAPE .190) -->
+  <dialog id="beansVaultDialog" class="app-dialog" closedby="any" aria-labelledby="beansVaultTitle">
+    <div class="app-dialog-shell">
+      <div class="report-header">
+        <div class="report-header-info">
+          <h1 id="beansVaultTitle" class="report-title-heading">🫘 BÓVEDA DE CAFÉS & RECETAS (IKAPE .190)</h1>
+          <div id="beansVaultSub" style="font-size: 11px; color: #94a3b8; margin-top: 2px;">
+            Almacenada en la memoria Flash de la ESP32 IKAPE · Descuento automático de stock y frescura post-tueste
+          </div>
+        </div>
+        <button type="button" class="chart-close-btn" aria-label="Cerrar bóveda de cafés" onclick="document.getElementById('beansVaultDialog').close()">✖</button>
+      </div>
+
+      <div id="beanSwitchBanner" style="display:none; background:rgba(16,185,129,0.13); border:1px solid rgba(16,185,129,0.5); border-radius:8px; padding:10px 12px; font-size:12px; color:#d1fae5;" role="status" aria-live="polite"></div>
+
+      <div id="beansVaultList" class="bean-vault-grid"></div>
+
+      <form id="beanVaultForm" aria-labelledby="beanFormLegend" style="background:#191919; border:1px solid #333; border-radius:8px; padding:12px;">
+        <fieldset style="border:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px;">
+          <legend id="beanFormLegend" style="color:var(--accent); font-weight:bold; font-size:13px; margin-bottom:6px;">➕ AGREGAR / EDITAR BOLSA DE CAFÉ</legend>
+          <input type="hidden" id="bfId" name="id" value="-1">
+          <div class="vault-form-grid">
+            <div class="vault-field">
+              <label for="bfName">Nombre del Café *</label>
+              <input type="text" id="bfName" name="name" maxlength="27" required placeholder="Ej. Colombia Tabi">
+            </div>
+            <div class="vault-field">
+              <label for="bfRoaster">Tostador</label>
+              <input type="text" id="bfRoaster" name="roaster" maxlength="23" placeholder="Ej. Triciclo / Origen">
+            </div>
+            <div class="vault-field">
+              <label for="bfProcess">Proceso</label>
+              <select id="bfProcess" name="process">
+                <option value="Lavado">Lavado</option>
+                <option value="Natural">Natural</option>
+                <option value="Honey">Honey</option>
+                <option value="Anaeróbico">Anaeróbico</option>
+                <option value="Blend">Blend</option>
+              </select>
+            </div>
+            <div class="vault-field">
+              <label for="bfRoastDate">Fecha de Tueste</label>
+              <input type="date" id="bfRoastDate" name="roastDate">
+            </div>
+            <div class="vault-field">
+              <label for="bfInitG">Bolsa Inicial (g)</label>
+              <input type="number" id="bfInitG" name="initGrams" step="1" min="10" max="5000" value="250" required>
+            </div>
+            <div class="vault-field">
+              <label for="bfRemG">Stock Restante (g)</label>
+              <input type="number" id="bfRemG" name="remGrams" step="0.1" min="0" max="5000" value="250" required>
+            </div>
+            <div class="vault-field">
+              <label for="bfDose">Dosis Receta (g)</label>
+              <input type="number" id="bfDose" name="doseGrams" step="0.1" min="7" max="30" value="19.0" required>
+            </div>
+            <div class="vault-field">
+              <label for="bfRatio">Ratio Meta (1:X)</label>
+              <input type="number" id="bfRatio" name="targetRatio" step="0.1" min="1.0" max="4.0" value="2.0" required>
+            </div>
+            <div class="vault-field">
+              <label for="bfTemp">Temp. Bloque (°C)</label>
+              <input type="number" id="bfTemp" name="targetTemp" step="1" min="80" max="105" value="93" required>
+            </div>
+            <div class="vault-field">
+              <label for="bfGrind">Molienda DF54 (0–9)</label>
+              <input type="number" id="bfGrind" name="grindDf54" step="0.1" min="0" max="9.0" value="2.0" required>
+            </div>
+            <div class="vault-field">
+              <label for="bfPre">Pre-infusión (s)</label>
+              <input type="number" id="bfPre" name="preSec" step="1" min="0" max="15" value="3" required>
+            </div>
+            <div class="vault-field">
+              <label for="bfPausa">Pausa Bloom (s)</label>
+              <input type="number" id="bfPausa" name="pauseSec" step="1" min="0" max="15" value="3" required>
+            </div>
+            <div class="vault-field">
+              <label for="bfExp">Tiempo Meta (s)</label>
+              <input type="number" id="bfExp" name="expSec" step="1" min="15" max="60" value="30" required>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:4px;">
+            <button type="submit" class="btn-save" style="margin-top:0; flex:1 1 200px;">💾 GUARDAR BOLSA EN ESP32 IKAPE</button>
+            <button type="button" class="ikape-mini-btn" onclick="limpiarFormularioBolsa()">↺ Limpiar / Nueva bolsa</button>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- MODAL NATIVO: ESTACIÓN DE CAFÉS FILTRADOS / POUR-OVER (V60, ORIGAMI, AEROPRESS) -->
+  <dialog id="pouroverDialog" class="app-dialog" closedby="any" aria-labelledby="pouroverTitle">
+    <div class="app-dialog-shell">
+      <div class="report-header">
+        <div class="report-header-info">
+          <div class="report-title-row">
+            <h1 id="pouroverTitle" class="report-title-heading">🫖 ESTACIÓN DE FILTRADOS / POUR-OVER</h1>
+            <span id="poPhaseBadge" class="phase-badge">LISTO</span>
+          </div>
+          <div style="font-size:11px; color:#94a3b8; margin-top:2px;">
+            Motor autónomo a 1 Hz en la ESP32 IKAPE (.190) · Auto-Dosis de espresso en pausa mientras filtras
+          </div>
+        </div>
+        <button type="button" class="chart-close-btn" aria-label="Salir de estación de filtrados" onclick="cerrarEstacionFiltrados()">✖</button>
+      </div>
+
+      <div class="vault-form-grid" style="background:#191919; border:1px solid #333; border-radius:8px; padding:10px;">
+        <div class="vault-field">
+          <label for="poMethodSel">Método / Receta</label>
+          <select id="poMethodSel" name="poMethod" onchange="cambiarRecetaFiltrado(true)">
+            <option value="v60">V60 Clásico 4 Etapas (1:16)</option>
+            <option value="origami">Origami Pulsos Dulces (1:15.5)</option>
+            <option value="aeropress">AeroPress Inmersión (1:13)</option>
+            <option value="custom">Libre / Personalizado</option>
+          </select>
+        </div>
+        <div class="vault-field">
+          <label for="poDoseInp">Café Molido (g)</label>
+          <input type="number" id="poDoseInp" name="poDose" step="0.5" min="8" max="60" value="15.0" onchange="cambiarRecetaFiltrado(false)">
+        </div>
+        <div class="vault-field">
+          <label for="poWaterInp">Agua Total Meta (g)</label>
+          <input type="number" id="poWaterInp" name="poWater" step="5" min="80" max="1000" value="240" onchange="enviarConfigPourover()">
+        </div>
+      </div>
+
+      <div class="report-stats-grid">
+        <div class="report-stat-card" style="border-color:rgba(16,185,129,0.45);">
+          <div class="report-stat-label">AGUA VERTIDA</div>
+          <div class="report-stat-val" id="poValWeight" style="color:#10b981;">0.0 g</div>
+          <div class="report-stat-sub" id="poValWeightSub">Meta: 240 g</div>
+        </div>
+        <div class="report-stat-card">
+          <div class="report-stat-label">CRONÓMETRO</div>
+          <div class="report-stat-val" id="poValTime" style="color:#fff;">0:00.0</div>
+          <div class="report-stat-sub" id="poValTimeSub">Auto-inicio disponible</div>
+        </div>
+        <div class="report-stat-card" style="border-color:rgba(56,189,248,0.45);">
+          <div class="report-stat-label">CAUDAL TETERA</div>
+          <div class="report-stat-val" id="poValFlow" style="color:#38bdf8;">0.0 g/s</div>
+          <div class="report-stat-sub" id="poValFlowSub">Ideal V60: 3.5–6.0 g/s</div>
+        </div>
+        <div class="report-stat-card" style="border-color:rgba(245,158,11,0.45);">
+          <div class="report-stat-label">RATIO EN VIVO</div>
+          <div class="report-stat-val" id="poValRatio" style="color:#f59e0b;">1:0.0</div>
+          <div class="report-stat-sub" id="poValRatioSub">15.0g café</div>
+        </div>
+      </div>
+
+      <div id="poActiveGuide" style="background:rgba(56,189,248,0.11); border:1px solid rgba(56,189,248,0.45); border-radius:8px; padding:10px 12px; font-size:13px; color:#e0f2fe; font-weight:bold;">
+        Enjuaga el filtro, agrega el café molido, pulsa «ARMAR AUTO-INICIO + TARE» y comienza el Bloom.
+      </div>
+
+      <div id="poStagesGrid" class="po-stage-list"></div>
+
+      <div style="block-size:210px; position:relative;">
+        <canvas id="pouroverCanvas" style="display:block; inline-size:100%; block-size:100%; margin-top:0; background:#0a0a0a; border:1px solid #333; border-radius:6px;"></canvas>
+      </div>
+
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button type="button" class="ikape-mini-btn" style="border-color:#10b981; color:#6ee7b7; flex:1 1 170px;" onclick="comandoPourover('arm', true)">🎯 ARMAR AUTO-INICIO + TARE</button>
+        <button type="button" id="btnPoStartStop" class="ikape-mini-btn" style="border-color:#38bdf8; color:#7dd3fc; flex:1 1 130px;" onclick="alternarStartStopPourover()">▶ INICIAR MANUAL</button>
+        <button type="button" class="ikape-mini-btn" onclick="tararBalanzaGranos()">⚖️ TARE 0.0g</button>
+        <button type="button" class="ikape-mini-btn" onclick="comandoPourover('reset', false)">↺ REINICIAR</button>
+        <button type="button" class="ikape-mini-btn" style="border-color:#f59e0b; color:#fde68a;" onclick="descargarCsvPourover()">📥 CSV V60</button>
+      </div>
+    </div>
+  </dialog>
+
   <script>
     let state = { pwr: false, stm: false, pmp: false, target: 93 };
     let tempHistory = Array(60).fill(93);
@@ -1280,7 +1692,22 @@
     }
     function togglePower() { fetch('http://192.168.1.68/setPower?state=' + (state.pwr ? '0' : '1')); }
     function toggleSteam() { fetch('http://192.168.1.68/setSteam?state=' + (state.stm ? '0' : '1')); }
-    function togglePump() { fetch('http://192.168.1.68/setPump?state=' + (state.pmp ? '0' : '1')); }
+    function togglePump() {
+      fetch('http://192.168.1.68/setPump?state=' + (state.pmp ? '0' : '1'))
+        .then(r => r.text())
+        .then(txt => {
+          if (txt && txt.trim() === 'TANK_EMPTY') {
+            mostrarToast('⚠ Tanque bajo (<100 ml): pulsa «💧 Llenar 1L» tras recargar agua', '#e74c3c', 4500);
+          }
+        })
+        .catch(() => {});
+    }
+    function recargarTanqueWeb() {
+      fetch('http://192.168.1.68/setTank?val=1000')
+        .then(r => r.json())
+        .then(() => mostrarToast('💧 Tanque actualizado a 1000 ml ✔', '#10b981', 2600))
+        .catch(() => mostrarToast('Sin conexión con cafetera (.68)', '#e74c3c', 2600));
+    }
     let lockInputsUntil = 0;
     const valNum = (id) => String(document.getElementById(id).value).replace(',', '.').trim();
     const buildQuery = (pairs) => {
@@ -1331,13 +1758,38 @@
       document.getElementById('wExp').value = p.expTime;
       document.getElementById('wWeight').value = p.tWeight;
       document.getElementById('wGrind').value = p.grind;
+      const ratioInp = document.getElementById('wRatio');
+      const useRatioChk = document.getElementById('wUseRatio');
+      if (ratioInp) ratioInp.value = p.tRatio || 2.0;
+      if (useRatioChk) useRatioChk.checked = (p.useRatio !== false);
+      actualizarPreviewRatioBbw();
 
       // Solo enviar a la ESP32 al cambiar de pestaña dentro del modal, no al abrirlo
       if (aplicarEnEsp32) saveBbw(true);
     }
 
+    function actualizarPreviewRatioBbw() {
+      const prevEl = document.getElementById('wEffectivePreview');
+      if (!prevEl) return;
+      const useR = document.getElementById('wUseRatio') ? document.getElementById('wUseRatio').checked : true;
+      const rVal = parseFloat(valNum('wRatio')) || 2.0;
+      const wVal = parseFloat(valNum('wWeight')) || 36.0;
+      if (useR && ultimaDosisPesada >= 5.0) {
+        const eff = (ultimaDosisPesada * rVal).toFixed(1);
+        prevEl.innerText = `Meta dinámica activa: ${eff} g (${ultimaDosisPesada.toFixed(1)}g × 1:${rVal.toFixed(1)})`;
+        prevEl.style.color = '#10b981';
+      } else if (useR) {
+        prevEl.innerText = `Modo Ratio 1:${rVal.toFixed(1)} activo · Sin dosis pesada aún (respaldo: ${wVal.toFixed(1)}g)`;
+        prevEl.style.color = '#fbbf24';
+      } else {
+        prevEl.innerText = `Modo Peso Fijo activo: cortará siempre en ${wVal.toFixed(1)} g`;
+        prevEl.style.color = '#94a3b8';
+      }
+    }
+
     function saveBbw(silencioso = false) {
       lockInputsUntil = Date.now() + 2500;
+      const useRatioChecked = document.getElementById('wUseRatio') ? document.getElementById('wUseRatio').checked : true;
 
       // Guardar el perfil modificado en el navegador
       perfilesBbw[perfilActivo] = {
@@ -1346,14 +1798,17 @@
         pausa: valNum('wPausa'),
         expTime: valNum('wExp'),
         tWeight: valNum('wWeight'),
+        tRatio: valNum('wRatio') || '2.0',
+        useRatio: useRatioChecked,
         grind: valNum('wGrind')
       };
       localStorage.setItem('bbw_profiles', JSON.stringify(perfilesBbw));
 
       let q = buildQuery([
         ['pre', 'wPre'], ['pausa', 'wPausa'],
-        ['expTime', 'wExp'], ['tWeight', 'wWeight'], ['grind', 'wGrind']
+        ['expTime', 'wExp'], ['tWeight', 'wWeight'], ['tRatio', 'wRatio'], ['grind', 'wGrind']
       ]);
+      q += '&useRatio=' + (useRatioChecked ? '1' : '0');
       fetch('http://192.168.1.68/setSettings?' + q).then(() => {
         if (!silencioso) {
           mostrarToast("Perfil " + (perfilActivo === 1 ? "IKAPE" : "ALIKISS") + " Aplicado!", "#10b981", 3000);
@@ -1784,10 +2239,15 @@
         card.addEventListener('click', () => verGraficoHistorial(originalIndex));
 
         const tipo = log.isSteam ? 'VAPOR' : 'EXTRACCIÓN';
-        const rawDose = (typeof dosisPorShot !== 'undefined') ? parseFloat(dosisPorShot[originalIndex]) : NaN;
-        const dosisGuardada = (!log.isSteam && rawDose > 0) ? rawDose : 0;
+        const rawLocalDose = (typeof dosisPorShot !== 'undefined') ? parseFloat(dosisPorShot[originalIndex]) : NaN;
+        const espDose = parseFloat(log.dose || 0);
+        const dosisGuardada = (!log.isSteam && (rawLocalDose > 0 ? rawLocalDose : espDose) > 0)
+          ? (rawLocalDose > 0 ? rawLocalDose : espDose)
+          : 0;
         const stats = calcularAnalisisShot(log, dosisGuardada);
-        const meta = (!log.isSteam && metaPorShot[originalIndex]) ? metaPorShot[originalIndex] : null;
+        const meta = (!log.isSteam && metaPorShot[originalIndex])
+          ? metaPorShot[originalIndex]
+          : (!log.isSteam && log.bean ? { bean: log.bean } : null);
         const diag = obtenerDiagnosticoParaLog(log, originalIndex, stats, dosisGuardada);
         const brakeInfo = !log.isSteam ? formatearFrenoInfo(obtenerDatosFreno(log, meta)) : null;
 
@@ -1863,6 +2323,8 @@
             }
             if (pendingLinkDose && !logs[0].isSteam && ultimaDosisPesada > 0) {
               dosisPorShot[0] = ultimaDosisPesada.toFixed(1);
+            } else if (!logs[0].isSteam && Number(logs[0].dose || 0) > 0) {
+              dosisPorShot[0] = Number(logs[0].dose).toFixed(1);
             } else {
               delete dosisPorShot[0];
             }
@@ -2868,9 +3330,14 @@
       const log = globalHistory[index];
       if (!log || !log.temp || log.temp.length === 0) { alert("Aún no hay datos de curva."); return; }
 
-      const rawDose = parseFloat(dosisPorShot[index]);
-      const dosis = (!log.isSteam && rawDose > 0) ? rawDose : 0;
-      const meta = (!log.isSteam && metaPorShot[index]) ? metaPorShot[index] : null;
+      const rawLocalDose = parseFloat(dosisPorShot[index]);
+      const espDose = parseFloat(log.dose || 0);
+      const dosis = (!log.isSteam && (rawLocalDose > 0 ? rawLocalDose : espDose) > 0)
+        ? (rawLocalDose > 0 ? rawLocalDose : espDose)
+        : 0;
+      const meta = (!log.isSteam && metaPorShot[index])
+        ? metaPorShot[index]
+        : (!log.isSteam && log.bean ? { bean: log.bean } : null);
       const stats = calcularAnalisisShot(log, dosis);
       const diag = obtenerDiagnosticoParaLog(log, index, stats, dosis);
       const tipo = log.isSteam ? "VAPOR" : "EXTRACCIÓN";
@@ -2897,9 +3364,11 @@
           const r = dialog.getBoundingClientRect();
           return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
         };
-        let pressedOutside = false;
-        chartModalEl.addEventListener('pointerdown', (e) => { pressedOutside = outside(e, chartModalEl); });
-        chartModalEl.addEventListener('pointerup', (e) => { if (pressedOutside && outside(e, chartModalEl)) chartModalEl.close(); });
+        document.querySelectorAll('dialog[closedby="any"]').forEach((dlg) => {
+          let pressedOutside = false;
+          dlg.addEventListener('pointerdown', (e) => { pressedOutside = outside(e, dlg); });
+          dlg.addEventListener('pointerup', (e) => { if (pressedOutside && outside(e, dlg)) dlg.close(); });
+        });
       }
 
       const btnKeep = document.getElementById('btnKeepChartOpen');
@@ -3091,6 +3560,31 @@
           document.getElementById('valTime').classList.remove('freno-activo');
         }
 
+        // Sincronizar dosis enviada directamente por M2M desde la IKAPE hacia la Oster (.68) si el navegador estaba cerrado
+        if (d.dose !== undefined && Number(d.dose) >= 5.0 && Math.abs(Number(d.dose) - ultimaDosisPesada) >= 0.09 && !ikapeOnline) {
+          ultimaDosisPesada = Number(d.dose);
+          dosisRegistrada = true;
+          localStorage.setItem('ikape_ultima_dosis', ultimaDosisPesada.toFixed(1));
+          localStorage.setItem('ikape_dosis_registrada', '1');
+          actualizarVistaDosis();
+        }
+
+        // Actualizar meta dinámica Brew-by-Ratio en vivo
+        const ratioHintEl = document.getElementById('ikapeTargetRatioHint');
+        if (ratioHintEl) {
+          const effW = Number(d.effWeight !== undefined ? d.effWeight : d.tWeight || 0);
+          if (d.extMode == 1 && d.useRatio == 1 && Number(d.dose || ultimaDosisPesada) >= 5.0) {
+            ratioHintEl.innerText = `Meta BBW: ${effW.toFixed(1)}g (1:${Number(d.tRatio || 2.0).toFixed(1)})`;
+            ratioHintEl.style.color = '#10b981';
+          } else if (d.extMode == 1) {
+            ratioHintEl.innerText = `Meta BBW: ${effW.toFixed(1)}g`;
+            ratioHintEl.style.color = '#94a3b8';
+          } else {
+            ratioHintEl.innerText = 'Modo: Flow Profiling';
+            ratioHintEl.style.color = '#94a3b8';
+          }
+        }
+
         // Actualizar Peso, Ratio en vivo y Caudal (g/s)
         if (d.peso !== undefined) {
           document.getElementById('valWeight').innerHTML = d.peso.toFixed(1) + '<span class="unit">g</span>';
@@ -3274,6 +3768,12 @@
 
             if (diag.status !== 'purge') {
               if (dosisActual > 0) pendingLinkDose = true;
+              if (ikapeOnline) {
+                fetch('http://192.168.1.190/commitDose').catch(() => {});
+                if (d.extMode == 1 && d.hasAdvice == 1 && d.grind !== undefined) {
+                  fetch('http://192.168.1.190/updateBeanGrind?grind=' + encodeURIComponent(d.grind)).catch(() => {});
+                }
+              }
               pendingShotMeta = {
                 target: Math.round(d.objetivo || state.target || 0),
                 grind: d.grind,
@@ -3355,6 +3855,11 @@
 
         safeUpdate('wPre', d.pre); safeUpdate('wPausa', d.pausa);
         safeUpdate('wExp', d.expTime); safeUpdate('wWeight', d.tWeight);
+        if (d.tRatio !== undefined) safeUpdate('wRatio', Number(d.tRatio).toFixed(1));
+        if (!modalAbierto && Date.now() >= lockInputsUntil && d.useRatio !== undefined) {
+          const urEl = document.getElementById('wUseRatio');
+          if (urEl && document.activeElement !== urEl) urEl.checked = (d.useRatio == 1);
+        }
         safeUpdate('wGrind', d.grind);
 
         // Sincronizar ajuste automático post-extracción al perfil local activo
@@ -3447,14 +3952,84 @@
 
 
     // ==========================================
-    // TELEMETRÍA BALANZA IKAPE (192.168.1.190)
+    // HUB INTELIGENTE BALANZA IKAPE (192.168.1.190): AUTO-DOSIS, BÓVEDA NVS Y ESTACIÓN POUR-OVER
     // ==========================================
+    if (!('switch' in HTMLInputElement.prototype)) {
+      import('https://esm.sh/input-switch-polyfill').catch(() => {});
+    }
+    if (typeof Temporal === 'undefined') {
+      import('https://esm.sh/temporal-polyfill')
+        .then((m) => { globalThis.Temporal = m.Temporal; if (vaultBeansCache.length) renderizarTarjetasBoveda(); })
+        .catch(() => {});
+    }
+
     let pesoGranosActual = 0;
     let ikapeOnline = false;
     let ikapePollSeq = 0;
+    let lastIkapeDoseSeq = null;
+    let targetDoseIkape = 19.0;
+    let lockIkapeSwitchesUntil = 0;
+
+    let vaultBeansCache = JSON.parse(localStorage.getItem('ikape_beans_vault_cache') || '[]');
+    let vaultActiveBeanId = parseInt(localStorage.getItem('ikape_active_bean_id') || '0', 10) || 0;
+
+    function escapeHtmlSafe(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function calcularFrescuraPostTueste(roastIso) {
+      if (!roastIso || !/^\d{4}-\d{2}-\d{2}$/.test(roastIso)) {
+        return { label: 'Sin fecha tueste', cls: '', days: null };
+      }
+      let days = null;
+      if (typeof Temporal !== 'undefined' && Temporal.PlainDate) {
+        try {
+          const roastPlain = Temporal.PlainDate.from(roastIso);
+          const todayPlain = Temporal.Now.plainDateISO();
+          days = todayPlain.since(roastPlain, { largestUnit: 'days' }).days;
+        } catch {
+          days = null;
+        }
+      }
+      if (days === null) {
+        const [y, m, d] = roastIso.split('-').map(Number);
+        const now = new Date();
+        const utcRoast = Date.UTC(y, m - 1, d);
+        const utcToday = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+        days = Math.round((utcToday - utcRoast) / 86400000);
+      }
+      if (days < 0) return { label: `Tueste futuro`, cls: 'fresh-degas', days };
+      if (days < 5) return { label: `🫧 Desgasificando · Día ${days}`, cls: 'fresh-degas', days };
+      if (days <= 35) return { label: `✨ Óptimo · Día ${days}`, cls: 'fresh-opt', days };
+      if (days <= 60) return { label: `⏳ Madurando · Día ${days}`, cls: 'fresh-aging', days };
+      return { label: `📉 Día ${days} post-tueste`, cls: 'fresh-old', days };
+    }
 
     function mostrarToastIkape(msg, color) {
-      mostrarToast(msg, color, 2200);
+      mostrarToast(msg, color, 2600);
+    }
+
+    function actualizarResumenGranoActivoDashboard(beanNameFromStatus, beanRemFromStatus) {
+      const sumEl = document.getElementById('ikapeBeanSummary');
+      if (!sumEl) return;
+      const activeBean = vaultBeansCache.find((b) => Number(b.id) === Number(vaultActiveBeanId));
+      if (activeBean) {
+        const rem = (beanRemFromStatus !== undefined && !Number.isNaN(Number(beanRemFromStatus)))
+          ? Number(beanRemFromStatus)
+          : Number(activeBean.remGrams || 0);
+        const fresh = calcularFrescuraPostTueste(activeBean.roastDate);
+        const freshTxt = fresh.days !== null ? ` · <span class="fresh-badge ${fresh.cls}">${fresh.label}</span>` : '';
+        sumEl.innerHTML = `🫘 <b style="color:#fbbf24;">${escapeHtmlSafe(activeBean.name)}</b> · <span style="color:#94a3b8;">${rem.toFixed(1)}g disp.</span>${freshTxt}`;
+      } else if (beanNameFromStatus) {
+        sumEl.innerHTML = `🫘 <b style="color:#fbbf24;">${escapeHtmlSafe(beanNameFromStatus)}</b> · <span style="color:#94a3b8;">${Number(beanRemFromStatus || 0).toFixed(1)}g disp.</span>`;
+      } else {
+        sumEl.innerHTML = `🫘 Grano activo: <span style="color:#94a3b8;">Abre «Bóveda Cafés» para gestionar</span>`;
+      }
     }
 
     function actualizarVistaDosis() {
@@ -3477,28 +4052,38 @@
       if (regBtn) {
         if (pesoGranosActual > 0.1) {
           if (dosisRegistrada && Math.abs(pesoGranosActual - ultimaDosisPesada) < 0.05) {
-            regBtn.innerText = '✔ DOSIS REGISTRADA';
+            regBtn.innerText = '✔ DOSIS FIJADA';
             regBtn.style.background = '#2ecc71';
             regBtn.style.borderColor = '#2ecc71';
             regBtn.style.color = '#000';
           } else {
-            regBtn.innerText = '✔ REGISTRAR (' + pesoGranosActual.toFixed(1) + 'g)';
+            regBtn.innerText = '✔ FIJAR (' + pesoGranosActual.toFixed(1) + 'g)';
             regBtn.style.background = '#f59e0b';
             regBtn.style.borderColor = '#f59e0b';
             regBtn.style.color = '#000';
           }
         } else if (dosisRegistrada && ultimaDosisPesada > 0) {
-          regBtn.innerText = '✔ REGISTRADA (' + ultimaDosisPesada.toFixed(1) + 'g)';
+          regBtn.innerText = '✔ FIJADA (' + ultimaDosisPesada.toFixed(1) + 'g)';
           regBtn.style.background = 'rgba(46, 204, 113, 0.15)';
           regBtn.style.borderColor = '#2ecc71';
           regBtn.style.color = '#2ecc71';
         } else {
           regBtn.innerText = '✔ REGISTRAR DOSIS';
-          regBtn.style.background = '#2a2a2a';
+          regBtn.style.background = '#242424';
           regBtn.style.borderColor = '#f59e0b';
           regBtn.style.color = '#f59e0b';
         }
       }
+      actualizarPreviewRatioBbw();
+    }
+
+    function cambiarConfigIkape() {
+      lockIkapeSwitchesUntil = Date.now() + 2500;
+      const aw = document.getElementById('swAutoWake')?.checked ? 1 : 0;
+      const ad = document.getElementById('swAutoDose')?.checked ? 1 : 0;
+      fetch(`http://192.168.1.190/setConfig?autoWake=${aw}&autoDose=${ad}`)
+        .then(() => mostrarToastIkape(`IKAPE: Auto-Wake ${aw ? 'ON' : 'OFF'} · Auto-Dosis ${ad ? 'ON' : 'OFF'}`, '#10b981'))
+        .catch(() => mostrarToastIkape('Sin conexión con ESP32 IKAPE (.190)', '#e74c3c'));
     }
 
     function registrarDosisGranos() {
@@ -3510,12 +4095,27 @@
         mostrarToastIkape('Coloca los granos en la balanza (> 0.1g)', '#e67e22');
         return;
       }
-      ultimaDosisPesada = pesoGranosActual;
-      dosisRegistrada = true;
-      localStorage.setItem('ikape_ultima_dosis', ultimaDosisPesada.toFixed(1));
-      localStorage.setItem('ikape_dosis_registrada', '1');
-      actualizarVistaDosis();
-      mostrarToastIkape('Dosis registrada: ' + ultimaDosisPesada.toFixed(1) + ' g ✔', '#10b981');
+      const dFix = Number(pesoGranosActual.toFixed(1));
+      fetch(`http://192.168.1.190/lockDose?dose=${dFix}`)
+        .then(r => r.json())
+        .then(res => {
+          ultimaDosisPesada = Number(res.lockedDose || dFix);
+          dosisRegistrada = true;
+          localStorage.setItem('ikape_ultima_dosis', ultimaDosisPesada.toFixed(1));
+          localStorage.setItem('ikape_dosis_registrada', '1');
+          actualizarVistaDosis();
+          cargarBovedaDesdeIkape(true);
+          mostrarToastIkape(`Dosis fijada y enviada a Oster: ${ultimaDosisPesada.toFixed(1)} g ✔`, '#10b981');
+        })
+        .catch(() => {
+          ultimaDosisPesada = dFix;
+          dosisRegistrada = true;
+          localStorage.setItem('ikape_ultima_dosis', ultimaDosisPesada.toFixed(1));
+          localStorage.setItem('ikape_dosis_registrada', '1');
+          fetch(`http://192.168.1.68/setDose?dose=${dFix}`).catch(() => {});
+          actualizarVistaDosis();
+          mostrarToastIkape(`Dosis registrada: ${ultimaDosisPesada.toFixed(1)} g`, '#10b981');
+        });
     }
 
     function limpiarDosisRegistrada() {
@@ -3523,10 +4123,13 @@
       dosisRegistrada = false;
       localStorage.removeItem('ikape_ultima_dosis');
       localStorage.removeItem('ikape_dosis_registrada');
-      let ratioEl = document.getElementById('valRatio');
+      const ratioEl = document.getElementById('valRatio');
       if (ratioEl) ratioEl.innerText = '1:--';
+      fetch('http://192.168.1.190/clearDose').then(() => cargarBovedaDesdeIkape(true)).catch(() => {
+        fetch('http://192.168.1.68/setDose?dose=0').catch(() => {});
+      });
       actualizarVistaDosis();
-      mostrarToastIkape('Dosis registrada borrada', '#94a3b8');
+      mostrarToastIkape('Dosis borrada (stock restaurado si no hubo extracción)', '#94a3b8');
     }
 
     if (ultimaDosisPesada > 0) {
@@ -3553,6 +4156,471 @@
         });
     }
 
+    // --- BÓVEDA PERSISTENTE DE CAFÉS EN ESP32 IKAPE (.190) ---
+    function cargarBovedaDesdeIkape(silencioso = false) {
+      return fetch('http://192.168.1.190/beans')
+        .then(r => r.json())
+        .then(data => {
+          if (Array.isArray(data.beans)) {
+            vaultBeansCache = data.beans;
+            vaultActiveBeanId = Number(data.activeId || 0);
+            localStorage.setItem('ikape_beans_vault_cache', JSON.stringify(vaultBeansCache));
+            localStorage.setItem('ikape_active_bean_id', String(vaultActiveBeanId));
+            renderizarTarjetasBoveda();
+            actualizarResumenGranoActivoDashboard();
+          }
+        })
+        .catch(() => {
+          if (!silencioso) renderizarTarjetasBoveda();
+        });
+    }
+
+    function abrirBovedaCafes() {
+      const dlg = document.getElementById('beansVaultDialog');
+      if (!dlg) return;
+      renderizarTarjetasBoveda();
+      if (!dlg.open) dlg.showModal();
+      cargarBovedaDesdeIkape(true);
+    }
+
+    function renderizarTarjetasBoveda() {
+      const listEl = document.getElementById('beansVaultList');
+      if (!listEl) return;
+      if (!vaultBeansCache || vaultBeansCache.length === 0) {
+        listEl.innerHTML = '<div style="color:#94a3b8; font-size:12px;">Conéctate a la ESP32 IKAPE (.190) o agrega tu primera bolsa abajo.</div>';
+        return;
+      }
+
+      listEl.innerHTML = '';
+      vaultBeansCache.forEach((b) => {
+        const isAct = Number(b.id) === Number(vaultActiveBeanId);
+        const initG = Math.max(1, Number(b.initGrams || 250));
+        const remG = Math.max(0, Number(b.remGrams || 0));
+        const doseG = Math.max(7, Number(b.doseGrams || 18.5));
+        const pct = Math.min(100, Math.round((remG / initG) * 100));
+        const shotsLeft = Math.floor(remG / doseG);
+        const fresh = calcularFrescuraPostTueste(b.roastDate);
+        const outW = (doseG * Number(b.targetRatio || 2.0)).toFixed(1);
+
+        const card = document.createElement('div');
+        card.className = 'bean-card' + (isAct ? ' is-active' : '');
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:6px;">
+            <div>
+              <div style="font-weight:bold; font-size:14px; color:${isAct ? '#fbbf24' : '#f8fafc'};">
+                ${isAct ? '★ ' : ''}${escapeHtmlSafe(b.name)}
+              </div>
+              <div style="font-size:11px; color:#94a3b8;">
+                ${escapeHtmlSafe(b.roaster || 'Tostador local')} · ${escapeHtmlSafe(b.process || 'Lavado')}
+              </div>
+            </div>
+            <span class="fresh-badge ${fresh.cls}">${escapeHtmlSafe(fresh.label)}</span>
+          </div>
+
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:#cbd5e1;">
+              <span>Stock: <b>${remG.toFixed(1)}g</b> / ${initG.toFixed(0)}g</span>
+              <span style="color:${shotsLeft <= 2 ? '#f87171' : '#94a3b8'};">~${shotsLeft} shots</span>
+            </div>
+            <div class="dose-progress-track" style="margin-top:4px;">
+              <div class="dose-progress-fill" style="inline-size:${pct}%; background:${pct < 20 ? '#ef4444' : '#10b981'};"></div>
+            </div>
+          </div>
+
+          <div style="font-size:11px; color:#e2e8f0; background:#121212; border:1px solid #2b2b2b; border-radius:5px; padding:6px 8px;">
+            Dosis <b>${doseG.toFixed(1)}g</b> → <b>${outW}g</b> (1:${Number(b.targetRatio || 2).toFixed(1)})<br>
+            Bloque <b>${Math.round(b.targetTemp || 93)}°C</b> · DF54 <b>${fmtComma(b.grindDf54 || 2.0)}</b> · Pre ${b.preSec || 3}s / Pausa ${b.pauseSec || 3}s
+          </div>
+
+          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:auto;">
+            <button type="button" class="ikape-mini-btn" style="flex:1 1 130px; border-color:#10b981; color:#6ee7b7;" data-act="select">⚡ ${isAct ? 'RE-APLICAR A OSTER' : 'ACTIVAR Y ENVIAR'}</button>
+            <button type="button" class="ikape-mini-btn" data-act="edit" aria-label="Editar ${escapeHtmlSafe(b.name)}">✏️</button>
+            <button type="button" class="ikape-mini-btn" style="border-color:#7f1d1d; color:#fca5a5;" data-act="del" aria-label="Eliminar ${escapeHtmlSafe(b.name)}">🗑️</button>
+          </div>
+        `;
+
+        card.querySelector('[data-act="select"]').addEventListener('click', () => activarBolsaEnSistema(b.id, b.name));
+        card.querySelector('[data-act="edit"]').addEventListener('click', () => cargarBolsaEnFormulario(b));
+        card.querySelector('[data-act="del"]').addEventListener('click', () => eliminarBolsaDeIkape(b.id, b.name));
+        listEl.appendChild(card);
+      });
+    }
+
+    function activarBolsaEnSistema(id, nombre) {
+      fetch(`http://192.168.1.190/selectBean?id=${id}&apply=1`)
+        .then(r => r.json())
+        .then(res => {
+          vaultActiveBeanId = Number(res.activeId);
+          localStorage.setItem('ikape_active_bean_id', String(vaultActiveBeanId));
+          renderizarTarjetasBoveda();
+          actualizarResumenGranoActivoDashboard();
+
+          const banner = document.getElementById('beanSwitchBanner');
+          const delta = Number(res.grindDelta || 0);
+          const um = Number(res.grindUm || 0);
+          if (banner) {
+            banner.style.display = 'block';
+            if (Math.abs(delta) >= 0.05) {
+              const dir = delta > 0 ? 'SUBE (más grueso)' : 'BAJA (más fino)';
+              banner.innerHTML = `✔ <b>${escapeHtmlSafe(nombre)}</b> enviada a la Oster (.68).<br>🔧 <b>Ajuste DF54:</b> ${dir} de <b>${fmtComma(res.prevGrind)}</b> a <b>${fmtComma(res.newGrind)}</b> (${delta > 0 ? '+' : ''}${fmtComma(delta)} / ${um > 0 ? '+' : ''}${um} µm) · Meta BBW base: ${res.targetWeight}g.`;
+            } else {
+              banner.innerHTML = `✔ <b>${escapeHtmlSafe(nombre)}</b> activa y sincronizada con la Oster (.68) · Mantén DF54 en <b>${fmtComma(res.newGrind)}</b>.`;
+            }
+          }
+          mostrarToastIkape(`Receta «${nombre}» enviada a la Oster ✔`, '#10b981');
+        })
+        .catch(() => mostrarToastIkape('Conéctate a la ESP32 IKAPE (.190) para cambiar de bolsa', '#e74c3c'));
+    }
+
+    function cargarBolsaEnFormulario(b) {
+      document.getElementById('bfId').value = b.id;
+      document.getElementById('bfName').value = b.name || '';
+      document.getElementById('bfRoaster').value = b.roaster || '';
+      document.getElementById('bfProcess').value = b.process || 'Lavado';
+      document.getElementById('bfRoastDate').value = b.roastDate || '';
+      document.getElementById('bfInitG').value = b.initGrams || 250;
+      document.getElementById('bfRemG').value = b.remGrams ?? 250;
+      document.getElementById('bfDose').value = b.doseGrams || 19.0;
+      document.getElementById('bfRatio').value = b.targetRatio || 2.0;
+      document.getElementById('bfTemp').value = Math.round(b.targetTemp || 93);
+      document.getElementById('bfGrind').value = b.grindDf54 ?? 2.0;
+      document.getElementById('bfPre').value = b.preSec ?? 3;
+      document.getElementById('bfPausa').value = b.pauseSec ?? 3;
+      document.getElementById('bfExp').value = b.expSec ?? 30;
+      document.getElementById('beanFormLegend').innerText = `✏️ EDITANDO BOLSA: ${b.name}`;
+      document.getElementById('bfName').focus();
+    }
+
+    function limpiarFormularioBolsa() {
+      document.getElementById('bfId').value = '-1';
+      document.getElementById('beanVaultForm').reset();
+      document.getElementById('beanFormLegend').innerText = '➕ AGREGAR / EDITAR BOLSA DE CAFÉ';
+    }
+
+    function eliminarBolsaDeIkape(id, nombre) {
+      if (!confirm(`¿Eliminar la bolsa «${nombre}» de la memoria de la ESP32 IKAPE?`)) return;
+      fetch(`http://192.168.1.190/deleteBean?id=${id}`)
+        .then(r => {
+          if (!r.ok) throw new Error('keep_one');
+          return cargarBovedaDesdeIkape(false);
+        })
+        .then(() => mostrarToastIkape('Bolsa eliminada', '#94a3b8'))
+        .catch(() => mostrarToastIkape('Debe quedar al menos 1 bolsa activa (o revisa red .190)', '#e67e22'));
+    }
+
+    document.getElementById('beanVaultForm')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const form = e.currentTarget;
+      if (!form.checkValidity()) {
+        form.querySelector(':invalid')?.focus();
+        return;
+      }
+      const params = new URLSearchParams();
+      new FormData(form).forEach((val, key) => {
+        const cleanVal = String(val).trim();
+        if (key === 'id' && cleanVal === '-1') return;
+        params.append(key, ['initGrams', 'remGrams', 'doseGrams', 'targetRatio', 'targetTemp', 'grindDf54'].includes(key)
+          ? cleanVal.replace(',', '.')
+          : cleanVal);
+      });
+      fetch('http://192.168.1.190/saveBean?' + params.toString())
+        .then(r => {
+          if (r.status === 409) throw new Error('FULL');
+          return r.json();
+        })
+        .then(() => {
+          limpiarFormularioBolsa();
+          cargarBovedaDesdeIkape(false);
+          mostrarToastIkape('Bolsa guardada en memoria Flash IKAPE ✔', '#10b981');
+        })
+        .catch((err) => {
+          mostrarToastIkape(err.message === 'FULL' ? 'Bóveda llena (máx. 8 bolsas)' : 'Sin conexión con ESP32 IKAPE (.190)', '#e74c3c');
+        });
+    });
+
+    // --- ESTACIÓN DE CAFÉS FILTRADOS / POUR-OVER (V60, ORIGAMI, AEROPRESS) ---
+    let poPollTimer = null;
+    let lastPoCurveData = null;
+
+    function obtenerEtapasFiltrado(method, dose, totalWater) {
+      const d = Math.max(5, Number(dose || 15));
+      const w = Math.max(60, Number(totalWater || 240));
+      if (method === 'origami') {
+        const stepW = Math.round(w / 5);
+        return [
+          { name: '1. Bloom Dulce', startSec: 0, endSec: 45, targetW: stepW, tip: `Vierte ${stepW}g suave en espiral y deja desgasificar` },
+          { name: '2. Pulso Acidez', startSec: 45, endSec: 90, targetW: stepW * 2, tip: `Sube hasta ${stepW * 2}g con chorro central medio` },
+          { name: '3. Pulso Cuerpo', startSec: 90, endSec: 130, targetW: stepW * 3, tip: `Lleva el peso a ${stepW * 3}g` },
+          { name: '4. Pulso Balance', startSec: 130, endSec: 165, targetW: stepW * 4, tip: `Lleva el peso a ${stepW * 4}g` },
+          { name: '5. Pulso Final', startSec: 165, endSec: 210, targetW: w, tip: `Completa ${w}g y deja drenar hasta cama plana` }
+        ];
+      }
+      if (method === 'aeropress') {
+        return [
+          { name: '1. Vertido Total', startSec: 0, endSec: 25, targetW: w, tip: `Vierte los ${w}g rápido mojando toda la molienda` },
+          { name: '2. Inmersión', startSec: 25, endSec: 90, targetW: w, tip: `Gira suavemente a 1:00 y coloca el émbolo` },
+          { name: '3. Presión Suave', startSec: 90, endSec: 125, targetW: w, tip: `Presiona con peso constante durante 30–35s hasta el siseo` }
+        ];
+      }
+      if (method === 'custom') {
+        return [
+          { name: 'Vertido Libre', startSec: 0, endSec: 180, targetW: w, tip: `Objetivo libre hasta ${w}g (${(w / d).toFixed(1)}:1)` }
+        ];
+      }
+      // V60 Clásico 4 Etapas
+      const bloomW = Math.min(w, Math.round(d * 2.5));
+      const firstW = Math.round(w * 0.60);
+      return [
+        { name: '1. Bloom', startSec: 0, endSec: 45, targetW: bloomW, tip: `Vierte hasta ${bloomW}g, haz swirl suave y espera a 0:45` },
+        { name: '2. Primer Vertido', startSec: 45, endSec: 75, targetW: firstW, tip: `Vierte en espiral constante (4–5 g/s) hasta ${firstW}g` },
+        { name: '3. Segundo Vertido', startSec: 75, endSec: 105, targetW: w, tip: `Completa hasta ${w}g antes de 1:45 y gira suavemente` },
+        { name: '4. Drawdown', startSec: 105, endSec: 175, targetW: w, tip: `Espera el drenado final (~2:45–3:00) con cama plana` }
+      ];
+    }
+
+    function formatearMinSeg(sec) {
+      const s = Math.max(0, Number(sec || 0));
+      const m = Math.floor(s / 60);
+      const rem = (s - m * 60).toFixed(1).padStart(4, '0');
+      return `${m}:${rem}`;
+    }
+
+    function cambiarRecetaFiltrado(recalcularRatioDefault) {
+      const method = document.getElementById('poMethodSel').value;
+      const dose = parseFloat(document.getElementById('poDoseInp').value) || 15.0;
+      const waterEl = document.getElementById('poWaterInp');
+      if (recalcularRatioDefault && method !== 'custom') {
+        const mult = method === 'origami' ? 15.5 : (method === 'aeropress' ? 13.0 : 16.0);
+        waterEl.value = Math.round(dose * mult);
+      }
+      enviarConfigPourover();
+    }
+
+    function enviarConfigPourover() {
+      const method = document.getElementById('poMethodSel').value;
+      const dose = parseFloat(document.getElementById('poDoseInp').value) || 15.0;
+      const water = parseFloat(document.getElementById('poWaterInp').value) || 240;
+      fetch(`http://192.168.1.190/pouroverCmd?action=config&method=${encodeURIComponent(method)}&dose=${dose}&water=${water}`).catch(() => {});
+      if (lastPoCurveData) renderizarVistaPourover(lastPoCurveData);
+    }
+
+    function abrirEstacionFiltrados() {
+      const dlg = document.getElementById('pouroverDialog');
+      if (!dlg) return;
+      if (!dlg.open) dlg.showModal();
+      fetch('http://192.168.1.190/pouroverCmd?action=enter').catch(() => {});
+      consultarDatosPourover();
+    }
+
+    function cerrarEstacionFiltrados() {
+      if (poPollTimer) { clearTimeout(poPollTimer); poPollTimer = null; }
+      fetch('http://192.168.1.190/pouroverCmd?action=exit').catch(() => {});
+      const dlg = document.getElementById('pouroverDialog');
+      if (dlg && dlg.open) dlg.close();
+    }
+
+    document.getElementById('pouroverDialog')?.addEventListener('close', () => {
+      if (poPollTimer) { clearTimeout(poPollTimer); poPollTimer = null; }
+      fetch('http://192.168.1.190/pouroverCmd?action=exit').catch(() => {});
+    });
+
+    function comandoPourover(action, withTare) {
+      const method = document.getElementById('poMethodSel').value;
+      const dose = parseFloat(document.getElementById('poDoseInp').value) || 15.0;
+      const water = parseFloat(document.getElementById('poWaterInp').value) || 240;
+      fetch(`http://192.168.1.190/pouroverCmd?action=${action}&tare=${withTare ? 1 : 0}&method=${encodeURIComponent(method)}&dose=${dose}&water=${water}`)
+        .then(() => {
+          if (action === 'arm') mostrarToastIkape('🎯 Auto-inicio armado y balanza tarada: empieza a verter', '#10b981');
+          consultarDatosPourover();
+        })
+        .catch(() => mostrarToastIkape('Sin conexión con ESP32 IKAPE (.190)', '#e74c3c'));
+    }
+
+    function alternarStartStopPourover() {
+      const st = lastPoCurveData ? Number(lastPoCurveData.state || 0) : 0;
+      comandoPourover(st === 2 ? 'stop' : 'start', false);
+    }
+
+    function consultarDatosPourover() {
+      const dlg = document.getElementById('pouroverDialog');
+      if (!dlg || !dlg.open) return;
+      if (poPollTimer) clearTimeout(poPollTimer);
+
+      fetch('http://192.168.1.190/pouroverData')
+        .then(r => r.json())
+        .then(d => {
+          lastPoCurveData = d;
+          renderizarVistaPourover(d);
+          poPollTimer = setTimeout(consultarDatosPourover, 300);
+        })
+        .catch(() => {
+          poPollTimer = setTimeout(consultarDatosPourover, 1200);
+        });
+    }
+
+    function renderizarVistaPourover(d) {
+      const method = document.getElementById('poMethodSel').value || d.method || 'v60';
+      const dose = parseFloat(document.getElementById('poDoseInp').value) || Number(d.dose || 15);
+      const targetW = parseFloat(document.getElementById('poWaterInp').value) || Number(d.targetWater || 240);
+      const curW = Math.max(0, Number(d.currentWeight || 0));
+      const curF = Math.max(0, Number(d.currentFlow || 0));
+      const elapsed = Number(d.elapsed || 0);
+      const st = Number(d.state || 0);
+
+      document.getElementById('poValWeight').innerText = `${curW.toFixed(1)} g`;
+      document.getElementById('poValWeightSub').innerText = `Meta: ${targetW.toFixed(0)} g (${Math.min(100, Math.round((curW / Math.max(1, targetW)) * 100))}%)`;
+      document.getElementById('poValTime').innerText = formatearMinSeg(elapsed);
+      document.getElementById('poValTimeSub').innerText = st === 1 ? '🎯 Esperando 1er chorro...' : (st === 2 ? '● En extracción' : (st === 3 ? '✔ Finalizado' : 'En espera'));
+      document.getElementById('poValFlow').innerText = `${curF.toFixed(1)} g/s`;
+      document.getElementById('poValFlowSub').innerText = `Pico: ${Number(d.peakFlow || 0).toFixed(1)} g/s · Prom: ${Number(d.avgFlow || 0).toFixed(1)} g/s`;
+      document.getElementById('poValRatio').innerText = `1:${(curW / Math.max(1, dose)).toFixed(1)}`;
+      document.getElementById('poValRatioSub').innerText = `Dosis ${dose.toFixed(1)}g → 1:${(targetW / Math.max(1, dose)).toFixed(1)}`;
+
+      const badge = document.getElementById('poPhaseBadge');
+      const btnSS = document.getElementById('btnPoStartStop');
+      if (st === 1) {
+        badge.className = 'phase-badge is-adjust';
+        badge.innerText = '🎯 ARMADO (AUTO)';
+        btnSS.innerText = '▶ INICIAR YA';
+      } else if (st === 2) {
+        badge.className = 'phase-badge is-live';
+        badge.innerText = '● FILTRANDO';
+        btnSS.innerText = '⏹ FINALIZAR';
+      } else if (st === 3) {
+        badge.className = 'phase-badge is-good';
+        badge.innerText = '✔ TERMINADO';
+        btnSS.innerText = '▶ REANUDAR';
+      } else {
+        badge.className = 'phase-badge';
+        badge.innerText = 'LISTO';
+        btnSS.innerText = '▶ INICIAR MANUAL';
+      }
+
+      const stages = obtenerEtapasFiltrado(method, dose, targetW);
+      const stagesEl = document.getElementById('poStagesGrid');
+      stagesEl.innerHTML = '';
+      let activeStage = stages[stages.length - 1];
+      stages.forEach((s) => {
+        const isCurrent = st === 2 && elapsed >= s.startSec && elapsed < s.endSec;
+        const isDone = (st === 2 && elapsed >= s.endSec) || st === 3;
+        if (isCurrent) activeStage = s;
+        const chip = document.createElement('div');
+        chip.className = 'po-stage-chip' + (isCurrent ? ' is-current' : (isDone ? ' is-done' : ''));
+        chip.innerHTML = `<div style="font-weight:bold;">${escapeHtmlSafe(s.name)}</div><div style="color:#94a3b8;">${formatearMinSeg(s.startSec).slice(0, -2)}–${formatearMinSeg(s.endSec).slice(0, -2)} · <b>${s.targetW}g</b></div>`;
+        stagesEl.appendChild(chip);
+      });
+
+      const guideEl = document.getElementById('poActiveGuide');
+      if (st === 1) {
+        guideEl.innerText = `🎯 Auto-inicio armado (0.0g): vierte el agua del ${stages[0].name} hasta ${stages[0].targetW}g — el cronómetro arrancará solo.`;
+      } else if (st === 2) {
+        const remG = Math.max(0, activeStage.targetW - curW);
+        guideEl.innerText = `${activeStage.name}: ${activeStage.tip}${remG > 1 ? ` (faltan ${remG.toFixed(0)}g para meta de etapa)` : ' ✔ Meta de peso alcanzada'}`;
+      } else if (st === 3) {
+        guideEl.innerText = `✔ Extracción finalizada en ${formatearMinSeg(elapsed)} · Peso final ${Number(d.maxWeight || curW).toFixed(1)}g (Pico ${Number(d.peakFlow || 0).toFixed(1)} g/s).`;
+      }
+
+      dibujarCanvasPourover(d, stages, targetW);
+    }
+
+    function dibujarCanvasPourover(d, stages, targetW) {
+      const c = document.getElementById('pouroverCanvas');
+      if (!c) return;
+      const pCtx = c.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const w = c.clientWidth || 300;
+      const h = c.clientHeight || 200;
+      c.width = Math.floor(w * dpr);
+      c.height = Math.floor(h * dpr);
+      pCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      pCtx.clearRect(0, 0, w, h);
+
+      const pad = { top: 16, right: 12, bottom: 20, left: 12 };
+      const plotW = Math.max(20, w - pad.left - pad.right);
+      const plotH = Math.max(20, h - pad.top - pad.bottom);
+      const lastStageSec = stages.length ? stages[stages.length - 1].endSec : 180;
+      const maxSec = Math.max(lastStageSec, (d.weight ? d.weight.length : 0) + 10);
+      const maxYWeight = Math.max(targetW * 1.1, Number(d.maxWeight || 0) * 1.05, 100);
+      const maxYFlow = 12.0;
+
+      const xSec = (s) => pad.left + (Math.min(maxSec, s) / maxSec) * plotW;
+      const yW = (val) => pad.top + plotH - (Math.min(maxYWeight, Math.max(0, val)) / maxYWeight) * plotH;
+      const yF = (val) => pad.top + plotH - (Math.min(maxYFlow, Math.max(0, val)) / maxYFlow) * plotH;
+
+      // Escalones ideales de la receta (línea punteada ámbar)
+      pCtx.save();
+      pCtx.strokeStyle = 'rgba(245, 158, 11, 0.45)';
+      pCtx.setLineDash([4, 4]);
+      pCtx.lineWidth = 1.5;
+      pCtx.beginPath();
+      let prevW = 0;
+      pCtx.moveTo(xSec(0), yW(0));
+      stages.forEach((s) => {
+        pCtx.lineTo(xSec(s.startSec + Math.min(18, (s.endSec - s.startSec) * 0.6)), yW(s.targetW));
+        pCtx.lineTo(xSec(s.endSec), yW(s.targetW));
+        prevW = s.targetW;
+      });
+      pCtx.stroke();
+      pCtx.restore();
+
+      // Curva real de agua vertida (g)
+      const wArr = Array.isArray(d.weight) ? d.weight : [];
+      const fArr = Array.isArray(d.flow) ? d.flow : [];
+      if (wArr.length > 0) {
+        pCtx.beginPath();
+        wArr.forEach((v, idx) => {
+          const x = xSec(idx);
+          const y = yW(v);
+          if (idx === 0) pCtx.moveTo(x, y); else pCtx.lineTo(x, y);
+        });
+        pCtx.strokeStyle = '#10b981';
+        pCtx.lineWidth = 2.5;
+        pCtx.stroke();
+
+        pCtx.beginPath();
+        fArr.forEach((v, idx) => {
+          const x = xSec(idx);
+          const y = yF(v);
+          if (idx === 0) pCtx.moveTo(x, y); else pCtx.lineTo(x, y);
+        });
+        pCtx.strokeStyle = '#38bdf8';
+        pCtx.lineWidth = 1.8;
+        pCtx.stroke();
+      }
+
+      pCtx.font = 'bold 10px monospace';
+      pCtx.fillStyle = '#f59e0b';
+      pCtx.fillText(`Guía receta (${targetW}g)`, pad.left + 4, 12);
+      pCtx.fillStyle = '#10b981';
+      pCtx.fillText('Agua (g)', pad.left + 135, 12);
+      pCtx.fillStyle = '#38bdf8';
+      pCtx.fillText('Caudal (0–12 g/s)', pad.left + 205, 12);
+
+      pCtx.fillStyle = '#64748b';
+      for (let k = 0; k <= 4; k++) {
+        const sLbl = Math.round((maxSec * k) / 4);
+        const xl = pad.left + (plotW * k) / 4;
+        pCtx.textAlign = k === 0 ? 'left' : (k === 4 ? 'right' : 'center');
+        pCtx.fillText(formatearMinSeg(sLbl).slice(0, -2), xl, h - 5);
+      }
+    }
+
+    function descargarCsvPourover() {
+      if (!lastPoCurveData || !Array.isArray(lastPoCurveData.weight) || lastPoCurveData.weight.length === 0) {
+        mostrarToastIkape('Aún no hay curva de filtrado registrada', '#e67e22');
+        return;
+      }
+      const method = lastPoCurveData.method || 'v60';
+      const dose = Number(lastPoCurveData.dose || 15);
+      const rows = ['Tiempo(s),Agua_Vertida(g),Caudal_Tetera(g/s),Ratio(1:X),Metodo,Cafe(g)'];
+      lastPoCurveData.weight.forEach((w, idx) => {
+        const f = Number(lastPoCurveData.flow[idx] || 0).toFixed(1);
+        const r = (Number(w) / Math.max(1, dose)).toFixed(2);
+        rows.push(`${idx},${Number(w).toFixed(1)},${f},${r},${method},${dose.toFixed(1)}`);
+      });
+      descargarArchivoCsv(rows.join('\n') + '\n', `Filtrado_${method}_${dose.toFixed(0)}g.csv`);
+    }
+
     function pedirDatosBalanzaGranos() {
       const seq = ikapePollSeq;
       const controller = new AbortController();
@@ -3569,30 +4637,131 @@
             setTimeout(pedirDatosBalanzaGranos, 250);
             return;
           }
+          const wasOffline = !ikapeOnline;
           ikapeOnline = true;
+          if (wasOffline) cargarBovedaDesdeIkape(true);
+
           const dot = document.getElementById('ikapeStatusDot');
           const valEl = document.getElementById('valGranos');
+          const batEl = document.getElementById('valIkapeBat');
+          const m2mEl = document.getElementById('ikapeM2mBadge');
+          const stbEl = document.getElementById('valIkapeStable');
+          const flowEl = document.getElementById('valIkapeFlow');
+          const hintEl = document.getElementById('ikapeAutoDoseHint');
+          const barEl = document.getElementById('ikapeDoseBarFill');
 
           if (dot) dot.style.color = (b.ble == 1) ? '#2ecc71' : '#e74c3c';
+          if (batEl) {
+            if (b.ble == 1 && Number(b.bat) > 0) {
+              batEl.style.display = 'inline';
+              batEl.innerText = `(🔋 ${b.bat}%)`;
+              batEl.style.color = Number(b.bat) < 20 ? '#e74c3c' : '#2ecc71';
+            } else {
+              batEl.style.display = 'none';
+            }
+          }
+          if (m2mEl) m2mEl.style.display = (b.osterLinked == 1) ? 'inline-block' : 'none';
+          if (stbEl) stbEl.style.display = (b.ble == 1 && b.stable == 1 && Number(b.pesoGranos) > 0.2) ? 'inline' : 'none';
+          if (flowEl && b.flow !== undefined) {
+            flowEl.innerHTML = `${Number(b.flow).toFixed(1)} <span style="color:#888; font-weight:normal;">g/s</span>`;
+          }
 
           const pesoVal = Number(b.pesoGranos);
           if (!Number.isNaN(pesoVal) && valEl) {
             pesoGranosActual = pesoVal;
             valEl.innerHTML = pesoVal.toFixed(1) + '<span class="unit">g</span>';
           }
-          actualizarVistaDosis();
 
+          if (b.targetDose !== undefined && Number(b.targetDose) > 0) {
+            targetDoseIkape = Number(b.targetDose);
+          }
+          if (barEl) {
+            const pct = Math.min(100, Math.max(0, (pesoGranosActual / Math.max(1, targetDoseIkape)) * 100));
+            barEl.style.inlineSize = `${pct}%`;
+            const diff = Math.abs(pesoGranosActual - targetDoseIkape);
+            barEl.style.backgroundColor = diff <= 0.2 ? '#10b981' : (pesoGranosActual > targetDoseIkape + 0.3 ? '#ef4444' : '#f59e0b');
+          }
+
+          if (Date.now() >= lockIkapeSwitchesUntil) {
+            const swAw = document.getElementById('swAutoWake');
+            const swAd = document.getElementById('swAutoDose');
+            if (swAw && b.autoWake !== undefined) swAw.checked = (b.autoWake == 1);
+            if (swAd && b.autoDose !== undefined) swAd.checked = (b.autoDose == 1);
+          }
+
+          // Sincronización automática de Auto-Dosis bloqueada en la ESP32 IKAPE
+          if (b.doseSeq !== undefined) {
+            const curSeq = Number(b.doseSeq);
+            const lDose = Number(b.lockedDose || 0);
+            if (lastIkapeDoseSeq !== null && curSeq !== lastIkapeDoseSeq) {
+              if (lDose > 0.1) {
+                ultimaDosisPesada = lDose;
+                dosisRegistrada = true;
+                localStorage.setItem('ikape_ultima_dosis', ultimaDosisPesada.toFixed(1));
+                localStorage.setItem('ikape_dosis_registrada', '1');
+                cargarBovedaDesdeIkape(true);
+                mostrarToastIkape(`🤖 Auto-Dosis fijada: ${lDose.toFixed(1)}g ✔ (enviada a Oster)`, '#10b981');
+              }
+            } else if (lastIkapeDoseSeq === null && lDose > 0.1 && ultimaDosisPesada <= 0) {
+              ultimaDosisPesada = lDose;
+              dosisRegistrada = true;
+              localStorage.setItem('ikape_ultima_dosis', ultimaDosisPesada.toFixed(1));
+              localStorage.setItem('ikape_dosis_registrada', '1');
+            }
+            lastIkapeDoseSeq = curSeq;
+          }
+
+          if (b.activeBeanId !== undefined) {
+            vaultActiveBeanId = Number(b.activeBeanId);
+            actualizarResumenGranoActivoDashboard(b.activeBeanName, b.activeBeanRem);
+          }
+
+          if (hintEl) {
+            if (b.pourover == 1) {
+              hintEl.innerText = '🫖 Modo Filtrados activo (Auto-Dosis de espresso pausada)';
+              hintEl.style.color = '#38bdf8';
+            } else if (b.ble != 1) {
+              hintEl.innerText = 'ESP32 IKAPE en línea · Enciende la balanza física para conectar BLE';
+              hintEl.style.color = '#f59e0b';
+            } else if (b.doseState == 2) {
+              hintEl.innerText = `🎯 ¡Estable en ${Number(b.primedDose).toFixed(1)}g! Levanta el vaso hacia el DF54 para fijarla sola`;
+              hintEl.style.color = '#10b981';
+            } else if (b.doseState == 1) {
+              const remD = targetDoseIkape - pesoGranosActual;
+              hintEl.innerText = Math.abs(remD) <= 0.15
+                ? `✨ ¡Dosis objetivo clavada (${targetDoseIkape.toFixed(1)}g)! Mantén 2s estable`
+                : (remD > 0 ? `⚖️ Dosificando hacia ${targetDoseIkape.toFixed(1)}g (faltan ${remD.toFixed(1)}g)` : `⚖️ Pasado por ${Math.abs(remD).toFixed(1)}g sobre ${targetDoseIkape.toFixed(1)}g`);
+              hintEl.style.color = '#fbbf24';
+            } else if (b.doseState == 3 && Number(b.lockedDose) > 0) {
+              hintEl.innerText = `✔ Dosis lista en cafetera: ${Number(b.lockedDose).toFixed(1)}g`;
+              hintEl.style.color = '#6ee7b7';
+            } else {
+              hintEl.innerText = b.autoDose == 1
+                ? `🤖 Auto-Dosis lista (meta ${targetDoseIkape.toFixed(1)}g · coloca el vaso y tara)`
+                : 'Modo dosis manual activo';
+              hintEl.style.color = '#94a3b8';
+            }
+          }
+
+          actualizarVistaDosis();
           setTimeout(pedirDatosBalanzaGranos, 250);
         })
         .catch(() => {
           clearTimeout(timeoutId);
           ikapeOnline = false;
           const dot = document.getElementById('ikapeStatusDot');
+          const hintEl = document.getElementById('ikapeAutoDoseHint');
           if (dot) dot.style.color = '#555';
+          if (hintEl) {
+            hintEl.innerText = 'ESP32 IKAPE (.190) desconectada · Usando caché local';
+            hintEl.style.color = '#64748b';
+          }
+          actualizarResumenGranoActivoDashboard();
           actualizarVistaDosis();
           setTimeout(pedirDatosBalanzaGranos, 1500);
         });
     }
+    actualizarResumenGranoActivoDashboard();
     pedirDatosBalanzaGranos();
 
     let oledMirrorActive = false;
